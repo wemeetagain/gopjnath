@@ -7,6 +7,14 @@ package gopjnath
 #include <pjlib.h>
 */
 
+/*
+#define CHECK(expr)     status=expr; \
+                        if (status!=PJ_SUCCESS) { \
+                            my_perror(#expr, status); \
+                            return status; \
+                        }
+*/
+
 import "C"
 
 import (
@@ -15,6 +23,22 @@ import (
     "time"
     "unsafe"
     )
+
+type cachingPool unsafe.Pointer
+
+var (
+    cp *cachingPool
+    pool pool
+    stunConfig *stunConfig
+    )
+
+func init() {
+    C.CHECK( C.pj_init() )
+    C.CHECK( C.pjlib_init() )
+    C.CHECK( C.pjnath_init() )
+    C.pj_caching_pool_init(cp, &C.pj_pool_factory_default_policy, 0)
+    
+}
 
 type TransportOp int
 
@@ -51,6 +75,15 @@ const (
     IceSessRoleControlled  IceSessRole(C.PJ_ICE_SESS_ROLE_CONTROLLED)
     IceSessRoleControlling IceSessRole(C.PJ_ICE_SESS_ROLE_CONTROLLING)
     
+type QosType int 
+
+const (
+    QosTypeBestEffort QosType(C.PJ_QOS_TYPE_BEST_EFFORT)
+    QosTypeBackground QosType(C.PJ_QOS_TYPE_BACKGROUND)
+    QosTypeVideo      QosType(C.PJ_QOS_TYPE_VIDEO)
+    QosTypeVoice      QosType(C.PJ_QOS_TYPE_VOICE)
+    QosTypeControl    QosType(C.PJ_QOS_TYPE_CONTROL)
+    )
 
 func casterr(fromcgo error) error {
     errno := fromcgo.(syscall.Errno)

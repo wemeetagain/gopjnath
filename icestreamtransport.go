@@ -25,7 +25,7 @@ type IceStreamTransport struct {
 }
 
 // pj_status_t pj_ice_strans_create (const char *name, const pj_ice_strans_cfg *cfg, unsigned comp_cnt, void *user_data, const pj_ice_strans_cb *cb, pj_ice_strans **p_ice_st)
-func NewIceStreamTransport(name string, t TransportConfig, compCnt int) (*IceStreamTransport, error) {
+func NewIceStreamTransport(name string, t IceTransportConfig, compCnt int) (*IceStreamTransport, error) {
     p := unsafe.Pointer{}
     stream := IceStreamTransport{}
     err := C.pj_ice_strans_create(name,t,compCnt,p,stream.cb,stream.i)

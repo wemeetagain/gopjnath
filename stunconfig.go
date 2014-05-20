@@ -16,8 +16,4 @@ import (
     "unsafe"
     )
 
-type IceSessOptions struct {
-    Aggressive                    bool
-    NominatedCheckDelay           uint
-    ControlledAgentWantNomTimeout int
-}
+type StunConfig struct

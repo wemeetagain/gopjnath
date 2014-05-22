@@ -54,9 +54,9 @@ func (i *IceStreamTransport) Destroy() error {
 // not implementing right now :)
 
 // pj_status_t pj_ice_strans_get_options (pj_ice_strans *ice_st, pj_ice_sess_options *opt)
-func (i *IceStreamTransport) GetOptions() (IceSessionOptions,error) {
+func (i *IceStreamTransport) GetOptions() (IceSessOptions,error) {
     o := IceSessionOptions{}
-    status := C.pj_ice_strans_get_options(i.i,o)
+    status := C.pj_ice_strans_get_options(i.i,o.o)
     if status != C.PJ_SUCCESS {
         return o, casterr(status)
     }
@@ -64,8 +64,8 @@ func (i *IceStreamTransport) GetOptions() (IceSessionOptions,error) {
 }
 
 // pj_status_t pj_ice_strans_set_options (pj_ice_strans *ice_st, const pj_ice_sess_options *opt)
-func (i *IceStreamTransport) SetOptions(o IceSessionOptions) error {
-    status := C.pj_ice_strans_set_options(i.i,o)
+func (i *IceStreamTransport) SetOptions(o IceSessOptions) error {
+    status := C.pj_ice_strans_set_options(i.i,o.o)
     if status != C.PJ_SUCCESS {
         return casterr(status)
     }
@@ -112,6 +112,7 @@ func (i *IceStreamTransport) GetUfragPwd() (string, string, string, string, erro
         return locUfrag, locPwd, remUfrag, remPwd, casterr(status)
     }
     return locUfrag, locPwd, remUfrag, remPwd, nil
+}
 
 // unsigned pj_ice_strans_get_cands_count (pj_ice_strans *ice_st, unsigned comp_id)
 func (i *IceStreamTransport) GetCandsCount() uint {

@@ -16,4 +16,6 @@ import (
     "unsafe"
     )
 
-type IceSessCheck struct
+type IceSessCheck struct {
+    c C.struct_pj_ice_sess_check
+}

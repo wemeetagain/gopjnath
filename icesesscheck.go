@@ -29,30 +29,30 @@ type IceSessCheck struct {
     c C.struct_pj_ice_sess_check
 }
 
-func (c *IceSessCheck) GetLCand() *IceSessCand {
+func (c *IceSessCheck) LCand() *IceSessCand {
     return &IceSessCand{c.c._lcand}
 }
 
-func (c *IceSessCheck) GetRCand() *IceSessCand {
+func (c *IceSessCheck) RCand() *IceSessCand {
     return &IceSessCand{c.c._rcand}
 }
 
-func (c *IceSessCheck) GetPriority() time.Time {
+func (c *IceSessCheck) Priority() time.Time {
     return time.Unix(int(c.c._prio),0)
 }
 
-func (c *IceSessCheck) GetState() IceSessCheckState {
+func (c *IceSessCheck) State() IceSessCheckState {
     return IceSessCheckState(c.c._state)
 }
 
-func (c *IceSessCheck) GetTxData() *StunTxData {
+func (c *IceSessCheck) TxData() *StunTxData {
     return &StunTxData{c.c._tdata}
 }
 
-func (c *IceSessCheck) GetNominated() bool {
+func (c *IceSessCheck) Nominated() bool {
     return bool(c.c._nominated)
 }
 
-func (c *IceSessCheck) GetErrCode() error {
+func (c *IceSessCheck) Error() error {
     return casterr(c.c._err_code)
 }

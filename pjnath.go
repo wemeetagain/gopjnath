@@ -27,8 +27,8 @@ import (
 type cachingPool unsafe.Pointer
 
 var (
-    cp *cachingPool
-    pool pool
+    cp C.struct_pj_caching_pool
+    pool C.struct_pj_pool_t
     stunConfig *stunConfig
     )
 
@@ -37,6 +37,7 @@ func init() {
     C.CHECK( C.pjlib_init() )
     C.CHECK( C.pjnath_init() )
     C.pj_caching_pool_init(cp, &C.pj_pool_factory_default_policy, 0)
+    pool = C.pj_pool_create(&cp._factory,"",512,512,nil)
     
 }
 

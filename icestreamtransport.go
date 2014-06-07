@@ -1,12 +1,10 @@
 package gopjnath
 
 /*
-#cgo pkg-config: libpjnath
 #include <pjnath.h>
 #include <pjlib-util.h>
 #include <pjlib.h>
 */
-
 import "C"
 
 import (
@@ -155,9 +153,23 @@ func (i *IceStreamTransport) ChangeRole(r IceSessRole) error {
     return nil
 }
 
+// helper function to turn []IceSessCand -> pj_ice_sess_cand[]
+func candSliceToCArray(cands []IceSessCand) {
+    var array = unsafe.Pointer(C.calloc(C.size_t(len(cands)), 1))
+    var arrayptr = uintptr(array)
+    for i:=0; i < len(cands); i++ {
+        *(*C.pj_ice_sess_cand) (unsafe.Pointer(arrayptr)) = C.pj_ice_sess_cand(cands[i])
+        arrayptr++
+    }
+    return array
+}
+
 // pj_status_t pj_ice_strans_start_ice (pj_ice_strans *ice_st, const pj_str_t *rem_ufrag, const pj_str_t *rem_passwd, unsigned rcand_cnt, const pj_ice_sess_cand rcand[])
-func (i *IceStreamTransport) StartIce(remUfrag,remPwd string, count uint, cands []IceSessionCand) error {
-    status := C.pj_ice_strans_start_ice(i.i,C.pj_str_t(remUfrag),C.pj_str_t(remPwd),C.uint(count),C.pj_ice_session_cand[](cands))
+func (i *IceStreamTransport) StartIce(remUfrag,remPwd string, count uint, cands []IceSessCand) error {
+    // must convert cands to C array
+    candArray := candSliceToCArray(cands)
+    defer C.free(candArray)
+    status := C.pj_ice_strans_start_ice(i.i,C.pj_str_t(remUfrag),C.pj_str_t(remPwd),C.uint(count),candArray)
     if status != PJ_SUCCESS {
         return casterr(status)
     }

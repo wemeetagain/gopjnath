@@ -1,12 +1,10 @@
 package gopjnath
 
 /*
-#cgo pkg-config: libpjnath
 #include <pjnath.h>
 #include <pjlib-util.h>
 #include <pjlib.h>
 */
-
 import "C"
 
 import (
@@ -19,10 +17,10 @@ import (
 type QosWmmPriority int
 
 var (
-    QosWmmPrioBulkEffort QosWmmPriority(PJ_QOS_PRIO_BULK_EFFORT)
-    QosWmmPrioBulk QosWmmPriority(PJ_QOS_PRIO_BULK)
-    QosWmmPrioVideo QosWmmPriority(PJ_QOS_PRIO_VIDEO)
-    QosWmmPrioVoice QosWmmPriority(PJ_QOS_PRIO_VOICE)
+    QosWmmPrioBulkEffort = QosWmmPriority(PJ_QOS_PRIO_BULK_EFFORT)
+    QosWmmPrioBulk       = QosWmmPriority(PJ_QOS_PRIO_BULK)
+    QosWmmPrioVideo      = QosWmmPriority(PJ_QOS_PRIO_VIDEO)
+    QosWmmPrioVoice      = QosWmmPriority(PJ_QOS_PRIO_VOICE)
     )
 
 type QosParams struct {

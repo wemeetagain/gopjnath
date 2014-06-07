@@ -1,12 +1,10 @@
 package gopjnath
 
 /*
-#cgo pkg-config: libpjnath
 #include <pjnath.h>
 #include <pjlib-util.h>
 #include <pjlib.h>
 */
-
 import "C"
 
 import (
@@ -19,11 +17,10 @@ import (
 type IceCandType int
 
 const (
-    IceCandTypeHost    IceCandType(C.PJ_ICE_CAND_TYPE_HOST)
-    IceCandTypeSrFlx   IceCandType(C.PJ_ICE_CAND_TYPE_SRFLX)
-    IceCandTypePrFlx   IceCandType(C.PJ_ICE_CAND_TYPE_PRFLX)
-    IceCandTypeRelayed IceCandType(C.PJ_ICE_CAND_TYPE_RELAYED)
-    IceCandTypeMax     IceCandType(C.PJ_ICE_CAND_TYPE_MAX)
+    IceCandTypeHost    = IceCandType(C.PJ_ICE_CAND_TYPE_HOST)
+    IceCandTypeSrFlx   = IceCandType(C.PJ_ICE_CAND_TYPE_SRFLX)
+    IceCandTypePrFlx   = IceCandType(C.PJ_ICE_CAND_TYPE_PRFLX)
+    IceCandTypeRelayed = IceCandType(C.PJ_ICE_CAND_TYPE_RELAYED)
     )
 
 type IceSessCand struct {

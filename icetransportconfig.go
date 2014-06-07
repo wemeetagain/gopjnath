@@ -1,12 +1,10 @@
 package gopjnath
 
 /*
-#cgo pkg-config: libpjnath
 #include <pjnath.h>
 #include <pjlib-util.h>
 #include <pjlib.h>
 */
-
 import "C"
 
 import (
@@ -19,9 +17,9 @@ import (
 type TurnTransportType int
 
 const (
-    TurnTransportUdp TurnTransportType(C.PJ_TURN_TP_UDP)
-    TurnTransportTcp TurnTransportType(C.PJ_TURN_TP_TCP)
-    TurnTransportTls TurnTransportType(C.PJ_TURN_TP_TLS)
+    TurnTransportUdp = TurnTransportType(C.PJ_TURN_TP_UDP)
+    TurnTransportTcp = TurnTransportType(C.PJ_TURN_TP_TCP)
+    TurnTransportTls = TurnTransportType(C.PJ_TURN_TP_TLS)
     )
 
 type IceTransportConfig struct {

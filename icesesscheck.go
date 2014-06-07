@@ -1,12 +1,10 @@
 package gopjnath
 
 /*
-#cgo pkg-config: libpjnath
 #include <pjnath.h>
 #include <pjlib-util.h>
 #include <pjlib.h>
 */
-
 import "C"
 
 import (
@@ -19,11 +17,12 @@ import (
 type IceSessCheckState int
 
 const (
-    IceSessCheckStateFrozen     IceSessCheckState(C.PJ_SESS_CHECK_STATE_FROZEN)
-    IceSessCheckStateWaiting    IceSessCheckState(C.PJ_SESS_CHECK_STATE_WAITING)
-    IceSessCheckStateInProgress IceSessCheckState(C.PJ_SESS_CHECK_STATE_IN_PROGRESS)
-    IceSessCheckStateSucceeded  IceSessCheckState(C.PJ_SESS_CHECK_STATE_SUCCEEDED)
-    IceSessCheckStateFailed     IceSessCheckState(C.PJ_SESS_CHECK_STATE_FAILED)
+    IceSessCheckStateFrozen     = IceSessCheckState(C.PJ_ICE_SESS_CHECK_STATE_FROZEN)
+    IceSessCheckStateWaiting    = IceSessCheckState(C.PJ_ICE_SESS_CHECK_STATE_WAITING)
+    IceSessCheckStateInProgress = IceSessCheckState(C.PJ_ICE_SESS_CHECK_STATE_IN_PROGRESS)
+    IceSessCheckStateSucceeded  = IceSessCheckState(C.PJ_ICE_SESS_CHECK_STATE_SUCCEEDED)
+    IceSessCheckStateFailed     = IceSessCheckState(C.PJ_ICE_SESS_CHECK_STATE_FAILED)
+    )
 
 type IceSessCheck struct {
     c C.struct_pj_ice_sess_check

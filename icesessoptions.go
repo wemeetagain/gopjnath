@@ -8,10 +8,6 @@ package gopjnath
 import "C"
 
 import (
-    "sync"
-    "syscall"
-    "time"
-    "unsafe"
     )
 
 type IceSessOptions struct {
@@ -19,25 +15,25 @@ type IceSessOptions struct {
 }
 
 func (o *IceSessOptions) SetAggressive(b bool) {
-    o.o._aggressive = C.int(b)
+    o.o.aggressive = C.int(b)
 }
 
 func (o *IceSessOptions) GetAggressive() bool {
-    return bool(o.o._aggressive)
+    return bool(o.o.aggressive)
 }
 
 func (o *IceSessOptions) SetNominatedCheckDelay(i int) {
-    o.o._nominated_check_delay = C.int(i)
+    o.o.nominated_check_delay = C.int(i)
 }
 
 func (o *IceSessOptions) GetNominatedCheckDelay() int {
-    return int(o.o._nominated_check_delay)
+    return int(o.o.nominated_check_delay)
 }
 
 func (o *IceSessOptions) SetControlledAgentWantNomTimeout(i uint) {
-    o.o._controlled_agent_want_nom_timeout = C.uint(i)
+    o.o.controlled_agent_want_nom_timeout = C.uint(i)
 }
 
 func (o *IceSessOptions) GetControlledAgentWantNomTimeout() uint {
-    return uint(o.o._controlled_agent_want_nom_timeout)
+    return uint(o.o.controlled_agent_want_nom_timeout)
 }

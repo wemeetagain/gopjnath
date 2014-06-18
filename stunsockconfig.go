@@ -8,10 +8,6 @@ package gopjnath
 import "C"
 
 import (
-    "sync"
-    "syscall"
-    "time"
-    "unsafe"
     )
 
 type StunSockConfig struct {
@@ -25,47 +21,49 @@ func NewStunSockConfig() *StunSockConfig {
 }
 
 func (c *StunSockConfig) SetMaxPacketSize(u uint) {
-    c.c._max_pkg_size = C.uint(u)
+    c.c.max_pkg_size = C.uint(u)
 }
 
 func (c *StunSockConfig) GetMaxPacketSize() uint {
-    return uint(c.c._max_pkg_size)
+    return uint(c.c.max_pkg_size)
 }
 
 func (c *StunSockConfig) SetAsyncCount(u uint) {
-    c.c._async_cnt = C.uint(u)
+    c.c.async_cnt = C.uint(u)
 }
 
 func (c *StunSockConfig) GetAsyncCount() uint {
-    return uint(c.c._async_cnt)
+    return uint(c.c.async_cnt)
 }
 
 //TODO  BoundAddr string
 
 func (c *StunSockConfig) SetPortRange(u uint16) {
-    c.c._port_range = C.ushort(u)
+    c.c.port_range = C.ushort(u)
 }
 
 func (c *StunSockConfig) GetPortRange() uint16 {
-    return uint16(c.c._port_range)
+    return uint16(c.c.port_range)
 }
 
 func (c *StunSockConfig) SetKaInterval(u int) {
-    c.c._ka_interval = C.int(u)
+    c.c.ka_interval = C.int(u)
 }
 
 func (c *StunSockConfig) GetKaInterval() int {
-    return int(c.c._ka_interval)
+    return int(c.c.ka_interval)
 }
 
 func (c *StunSockConfig) SetQosType(u QosType) {
-    c.c._qos_type = C.int(u)
+    c.c.qos_type = C.int(u)
 }
 
 func (c *StunSockConfig) GetQosType() QosType {
-    return QosType(c.c._qos_type)
+    return QosType(c.c.qos_type)
 }
 
+/*
+The pj_sock_set/get_qos_params() APIs are not portable, and it's probably only going to be implemented on Linux. Application should always try to use pj_sock_set_qos_type() instead. 
 func (c *StunSockConfig) SetQosParams(u QosParams) {
     c.c._qos_params = u.p
 }
@@ -73,27 +71,28 @@ func (c *StunSockConfig) SetQosParams(u QosParams) {
 func (c *StunSockConfig) GetQosParams() QosParams {
     return QosParams{c.c._qos_params}
 }
+*/
 
 func (c *StunSockConfig) SetQosIgnoreErr(u bool) {
-    c.c._qos_ignore_error = C.int(u)
+    c.c.qos_ignore_error = C.int(u)
 }
 
 func (c *StunSockConfig) GetQosIgnoreErr() bool {
-    return bool(c.c._qos_ignore_error)
+    return bool(c.c.qos_ignore_error)
 }
 
 func (c *StunSockConfig) SetRcvbufSize(u uint) {
-    c.c._so_rcvbuf_size = C.uint(u)
+    c.c.so_rcvbuf_size = C.uint(u)
 }
 
 func (c *StunSockConfig) GetRcvbufSize() uint {
-    return uint(c.c._so_rcvbuf_size)
+    return uint(c.c.so_rcvbuf_size)
 }
 
 func (c *StunSockConfig) SetSndbufSize(u uint) {
-    c.c._so_sndbuf_size = C.uint(u)
+    c.c.so_sndbuf_size = C.uint(u)
 }
 
 func (c *StunSockConfig) GetSndbufSize() uint {
-    return uint(c.c._so_sndbuf_size)
+    return uint(c.c.so_sndbuf_size)
 }

@@ -8,10 +8,6 @@ package gopjnath
 import "C"
 
 import (
-    "sync"
-    "syscall"
-    "time"
-    "unsafe"
     )
 
 type TurnTransportType int

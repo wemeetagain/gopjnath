@@ -8,9 +8,6 @@ package gopjnath
 import "C"
 
 import (
-    "sync"
-    "syscall"
-    "time"
     "unsafe"
     )
 
@@ -24,7 +21,7 @@ const (
     )
 
 type IceSessCand struct {
-    c C.struct_pj_ice_sess_cand
+    c *C.struct_pj_ice_sess_cand
 }
 
 func (c *IceSessCand) Type() IceCandType {
@@ -32,37 +29,39 @@ func (c *IceSessCand) Type() IceCandType {
 }
 
 func (c *IceSessCand) Status() error {
-    return casterr(c.c._status)
+    return casterr(c.c.status)
 }
 
 func (c *IceSessCand) ComponentId() uint8 {
-    return uint8(c.c._comp_id)
+    return uint8(c.c.comp_id)
 }
 
 func (c *IceSessCand) TransportId() uint8 {
-    return uint8(c.c._transport_id)
+    return uint8(c.c.transport_id)
 }
 
 func (c *IceSessCand) LocalPref() uint16 {
-    return uint16(c.c._local_pref)
+    return uint16(c.c.local_pref)
 }
 
 func (c *IceSessCand) Foundation() string {
-    return C.GoString(c.c._foundation)
+    f := C.pj_strbuf(&c.c.foundation)
+    defer C.free(unsafe.Pointer(f))
+    return C.GoString(f)
 }
 
 func (c *IceSessCand) Priority() uint32 {
-    return uint32(c.c._prio)
+    return uint32(c.c.prio)
 }
 
 func (c *IceSessCand) Addr() SockAddr {
-    return SockAddr{c.c._addr}
+    return SockAddr{c.c.addr}
 }
 
 func (c *IceSessCand) BaseAddr() SockAddr {
-    return SockAddr{c.c._base_addr}
+    return SockAddr{c.c.base_addr}
 }
 
 func (c *IceSessCand) RelAddr() SockAddr {
-    return SockAddr{c.c._rel_addr}
+    return SockAddr{c.c.rel_addr}
 }

@@ -8,10 +8,7 @@ package gopjnath
 import "C"
 
 import (
-    "sync"
-    "syscall"
     "time"
-    "unsafe"
     )
 
 type IceSessCheckState int
@@ -29,29 +26,29 @@ type IceSessCheck struct {
 }
 
 func (c *IceSessCheck) LCand() *IceSessCand {
-    return &IceSessCand{c.c._lcand}
+    return &IceSessCand{c.c.lcand}
 }
 
 func (c *IceSessCheck) RCand() *IceSessCand {
-    return &IceSessCand{c.c._rcand}
+    return &IceSessCand{c.c.rcand}
 }
 
 func (c *IceSessCheck) Priority() time.Time {
-    return time.Unix(int(c.c._prio),0)
+    return time.Unix(int(c.c.prio),0)
 }
 
 func (c *IceSessCheck) State() IceSessCheckState {
-    return IceSessCheckState(c.c._state)
+    return IceSessCheckState(c.c.state)
 }
 
 func (c *IceSessCheck) TxData() *StunTxData {
-    return &StunTxData{c.c._tdata}
+    return &StunTxData{c.c.tdata}
 }
 
 func (c *IceSessCheck) Nominated() bool {
-    return bool(c.c._nominated)
+    return bool(c.c.nominated)
 }
 
 func (c *IceSessCheck) Error() error {
-    return casterr(c.c._err_code)
+    return casterr(c.c.err_code)
 }

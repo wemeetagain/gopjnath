@@ -8,10 +8,6 @@ package gopjnath
 import "C"
 
 import (
-    "sync"
-    "syscall"
-    "time"
-    "unsafe"
     )
 
 type TurnAllocParam struct {
@@ -25,25 +21,25 @@ func NewTurnAllocParam() *TurnAllocParam {
 }
 
 func (t *TurnAllocParam) SetBandwidth(i int) {
-    t.t._bandwidth = C.int(i)
+    t.t.bandwidth = C.int(i)
 }
 
 func (t *TurnAllocParam) GetBandwidth() int {
-    return int(t.t._bandwidth)
+    return int(t.t.bandwidth)
 }
 
 func (t *TurnAllocParam) SetLifetime(i int) {
-    t.t._lifetime = C.int(i)
+    t.t.lifetime = C.int(i)
 }
 
 func (t *TurnAllocParam) GetLifetime() int {
-    return int(t.t._lifetime)
+    return int(t.t.lifetime)
 }
 
 func (t *TurnAllocParam) SeKaInterval(i int) {
-    t.t._ka_interval = C.int(i)
+    t.t.ka_interval = C.int(i)
 }
 
 func (t *TurnAllocParam) GetKaInterval() int {
-    return int(t.t._ka_interval)
+    return int(t.t.ka_interval)
 }

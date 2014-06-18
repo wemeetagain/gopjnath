@@ -1,16 +1,15 @@
 package gopjnath
 
 /*
-#include <pjnath.h>
-#include <pjlib-util.h>
+#cgo pkg-config: libpjproject
 #include <pjlib.h>
+#include <pjlib-util.h>
+#include <pjnath.h>
 */
 import "C"
 
 import (
-    "sync"
     "syscall"
-    "time"
     "unsafe"
     )
 
@@ -24,6 +23,7 @@ var (
 
 func init() {
     C.pj_init()
+    C.pjlib_util_init()
     C.pjnath_init()
     C.pj_caching_pool_init(cp, &C.pj_pool_factory_default_policy, 0)
     pool = C.pj_pool_create(&cp._factory,"",512,512,nil)
@@ -33,9 +33,9 @@ func init() {
 type TransportOp int
 
 const (
-    TransportStateInit        = TransportOp(C.PJ_ICE_STRANS_OP_INIT)
-    TransportStateNegotiation = TransportOp(C.PJ_ICE_STRANS_OP_NEGOTIATION)
-    TransportStateKeepAlive   = TransportOp(C.PJ_ICE_STRANS_OP_KEEP_ALIVE)
+    TransportOpStateInit        = TransportOp(C.PJ_ICE_STRANS_OP_INIT)
+    TransportOpStateNegotiation = TransportOp(C.PJ_ICE_STRANS_OP_NEGOTIATION)
+    TransportOpStateKeepAlive   = TransportOp(C.PJ_ICE_STRANS_OP_KEEP_ALIVE)
     )
 
 type TransportState int
@@ -68,7 +68,7 @@ const (
     QosTypeControl    = QosType(C.PJ_QOS_TYPE_CONTROL)
     )
 
-func casterr(fromcgo error) error {
+func casterr(fromcgo C.pj_status_t) error {
     errno := fromcgo.(syscall.Errno)
     if !ok {
         return fromcgo

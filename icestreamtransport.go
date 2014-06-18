@@ -9,8 +9,6 @@ import "C"
 
 import (
     "sync"
-    "syscall"
-    "time"
     "unsafe"
     )
 
@@ -24,9 +22,12 @@ type IceStreamTransport struct {
 
 // pj_status_t pj_ice_strans_create (const char *name, const pj_ice_strans_cfg *cfg, unsigned comp_cnt, void *user_data, const pj_ice_strans_cb *cb, pj_ice_strans **p_ice_st)
 func NewIceStreamTransport(name string, t IceTransportConfig, compCnt int) (*IceStreamTransport, error) {
+    n := C.CString(name)
+    defer C.free(unsafe.Pointer(n))
+    cnt := C.uint(compCnt)
     p := unsafe.Pointer{}
     stream := IceStreamTransport{}
-    err := C.pj_ice_strans_create(name,t,compCnt,p,stream.cb,stream.i)
+    err := C.pj_ice_strans_create(n,t.t,cnt,p,stream.cb,stream.i)
     if err != C.PJ_SUCCESS {
         return stream, casterr(err)
     }
@@ -45,7 +46,7 @@ func GetTransportStateName(t TransportState) {
 
 // pj_status_t pj_ice_strans_destroy (pj_ice_strans *ice_st)
 func (i *IceStreamTransport) Destroy() error {
-    return casterr(pj_ice_strans_destroy(i.i))
+    return casterr(C.pj_ice_strans_destroy(i.i))
 }
 
 // void * pj_ice_strans_get_user_data (pj_ice_strans *ice_st)
@@ -118,9 +119,9 @@ func (i *IceStreamTransport) GetCandsCount() uint {
 }
 
 // pj_status_t pj_ice_strans_enum_cands (pj_ice_strans *ice_st, unsigned comp_id, unsigned *count, pj_ice_sess_cand cand[])
-func (i *IceStreamTransport) GetCands() ([]IceSessionCand, error) {
+func (i *IceStreamTransport) GetCands() ([]IceSessCand, error) {
     var count C.uint
-    cands := make([]IceSessionCand)
+    cands := make([]IceSessCand)
     status := C.pj_ice_strans_enum_cands(i.i,count,cands)
     if status != PJ_SUCCESS {
         return cand, casterr(status)

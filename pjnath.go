@@ -15,11 +15,13 @@ import (
 
 type cachingPool unsafe.Pointer
 
-/*
+// TODO make init ... better
 var (
-    cp C.struct_pj_caching_pool
-    pool C.struct_pj_pool_t
-    stunConfig *stunConfig
+    cp *C.pj_caching_pool
+    pool *C.pj_pool_t
+    tHeap *C.pj_timer_heap_t
+    io *C.pj_ioqueue_t
+    quit bool
     )
 
 func init() {
@@ -27,10 +29,21 @@ func init() {
     C.pjlib_util_init()
     C.pjnath_init()
     C.pj_caching_pool_init(cp, &C.pj_pool_factory_default_policy, 0)
-    pool = C.pj_pool_create(&cp._factory,"",512,512,nil)
-    
+    str := C.CString("main")
+    defer C.free(unsafe.Pointer(str))
+    pool = C.pj_pool_create(&cp.factory,str,512,512,nil)
+    C.pj_timer_heap_create(pool,C.pj_size_t(1000),&tHeap)
+    C.pj_ioqueue_create(pool,C.pj_size_t(16),&io)
 }
-*/
+
+func poll() {
+    var delay C.pj_time_val
+    delay.msec = C.long(10)
+    for !quit {
+        C.pj_ioqueue_poll(io,&delay)
+        C.pj_timer_heap_poll(tHeap,nil)
+    }
+}
 
 type TransportOp int
 

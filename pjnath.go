@@ -9,12 +9,13 @@ package gopjnath
 import "C"
 
 import (
-    "syscall"
+    "errors"
     "unsafe"
     )
 
 type cachingPool unsafe.Pointer
 
+/*
 var (
     cp C.struct_pj_caching_pool
     pool C.struct_pj_pool_t
@@ -29,6 +30,7 @@ func init() {
     pool = C.pj_pool_create(&cp._factory,"",512,512,nil)
     
 }
+*/
 
 type TransportOp int
 
@@ -68,11 +70,10 @@ const (
     QosTypeControl    = QosType(C.PJ_QOS_TYPE_CONTROL)
     )
 
-func casterr(fromcgo C.pj_status_t) error {
-    errno := fromcgo.(syscall.Errno)
-    if !ok {
-        return fromcgo
-    }
-    pjstatus := pjStatus(errno)
-    return errno
+func casterr(err C.pj_status_t) error {
+    var buf *C.char
+    s := C.pj_strerror(err,buf,80)
+    str := C.pj_strbuf(&s)
+    defer C.free(unsafe.Pointer(str))
+    return errors.New(C.GoString(str))
 }

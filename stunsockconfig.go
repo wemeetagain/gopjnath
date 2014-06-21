@@ -11,7 +11,7 @@ import (
     )
 
 type StunSockConfig struct {
-    c C.struct_pj_stun_sock_cfg
+    c *C.pj_stun_sock_cfg
 }
 
 func NewStunSockConfig() *StunSockConfig {
@@ -21,11 +21,11 @@ func NewStunSockConfig() *StunSockConfig {
 }
 
 func (c *StunSockConfig) SetMaxPacketSize(u uint) {
-    c.c.max_pkg_size = C.uint(u)
+    c.c.max_pkt_size = C.uint(u)
 }
 
 func (c *StunSockConfig) GetMaxPacketSize() uint {
-    return uint(c.c.max_pkg_size)
+    return uint(c.c.max_pkt_size)
 }
 
 func (c *StunSockConfig) SetAsyncCount(u uint) {
@@ -36,10 +36,16 @@ func (c *StunSockConfig) GetAsyncCount() uint {
     return uint(c.c.async_cnt)
 }
 
-//TODO  BoundAddr string
+func (c *StunSockConfig) SetBoundAddr(s SockAddr) {
+    c.c.bound_addr = s.s
+}
+
+func (c *StunSockConfig) GetBoundAddr() *SockAddr {
+    return &SockAddr{c.c.bound_addr}
+}
 
 func (c *StunSockConfig) SetPortRange(u uint16) {
-    c.c.port_range = C.ushort(u)
+    c.c.port_range = C.pj_uint16_t(u)
 }
 
 func (c *StunSockConfig) GetPortRange() uint16 {
@@ -55,7 +61,7 @@ func (c *StunSockConfig) GetKaInterval() int {
 }
 
 func (c *StunSockConfig) SetQosType(u QosType) {
-    c.c.qos_type = C.int(u)
+    c.c.qos_type = C.pj_qos_type(u)
 }
 
 func (c *StunSockConfig) GetQosType() QosType {
@@ -73,12 +79,16 @@ func (c *StunSockConfig) GetQosParams() QosParams {
 }
 */
 
-func (c *StunSockConfig) SetQosIgnoreErr(u bool) {
-    c.c.qos_ignore_error = C.int(u)
+func (c *StunSockConfig) SetQosIgnoreErr(b bool) {
+    if b {
+        c.c.qos_ignore_error = C.pj_bool_t(C.int(1))
+    } else {
+        c.c.qos_ignore_error = C.pj_bool_t(C.int(0))
+    }
 }
 
 func (c *StunSockConfig) GetQosIgnoreErr() bool {
-    return bool(c.c.qos_ignore_error)
+    return int(c.c.qos_ignore_error) != 0
 }
 
 func (c *StunSockConfig) SetRcvbufSize(u uint) {

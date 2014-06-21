@@ -8,6 +8,7 @@ package gopjnath
 import "C"
 
 import (
+    "encoding/binary"
     "time"
     )
 
@@ -22,7 +23,7 @@ const (
     )
 
 type IceSessCheck struct {
-    c C.struct_pj_ice_sess_check
+    c *C.pj_ice_sess_check
 }
 
 func (c *IceSessCheck) LCand() *IceSessCand {
@@ -34,7 +35,7 @@ func (c *IceSessCheck) RCand() *IceSessCand {
 }
 
 func (c *IceSessCheck) Priority() time.Time {
-    return time.Unix(int(c.c.prio),0)
+    return time.Unix(int64(binary.LittleEndian.Uint64(c.c.prio[:8])),0)
 }
 
 func (c *IceSessCheck) State() IceSessCheckState {
@@ -46,7 +47,7 @@ func (c *IceSessCheck) TxData() *StunTxData {
 }
 
 func (c *IceSessCheck) Nominated() bool {
-    return bool(c.c.nominated)
+    return int(c.c.nominated) != 0
 }
 
 func (c *IceSessCheck) Error() error {

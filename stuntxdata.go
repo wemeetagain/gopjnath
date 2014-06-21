@@ -7,9 +7,6 @@ package gopjnath
 */
 import "C"
 
-import (
-    )
-
-type StunConfig struct {
-    c C.pj_stun_config
+type StunTxData struct {
+    d *C.pj_stun_tx_data
 }

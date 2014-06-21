@@ -8,6 +8,7 @@ package gopjnath
 import "C"
 
 import (
+    "unsafe"
     )
 
 type TurnTransportType int
@@ -19,7 +20,7 @@ const (
     )
 
 type IceTransportConfig struct {
-    t C.struct_pj_ice_strans_cfg
+    t *C.pj_ice_strans_cfg
 }
 
 // void pj_ice_strans_cfg_default (pj_ice_strans_cfg *cfg)
@@ -65,20 +66,28 @@ func (tc *IceTransportConfig) SetStunMaxHostCands(u uint) {
 
 // pj_bool_t loop_addr
 func (tc *IceTransportConfig) GetStunLoopAddr() bool {
-    return bool(tc.t.stun.loop_addr)
+    return int(tc.t.stun.loop_addr) != 0
 }
 
 func (tc *IceTransportConfig) SetStunLoopAddr(b bool) {
-    tc.t.stun.loop_addr = C.pj_bool_t(b)
+    if b {
+        tc.t.stun.loop_addr = C.pj_bool_t(C.int(1))
+    } else {
+        tc.t.stun.loop_addr = C.pj_bool_t(C.int(0))
+    }
 }
 
 // pj_str_t server
 func (tc *IceTransportConfig) GetStunServer() string {
-    return C.GoString(tc.t.stun.server)
+    str := C.pj_strbuf(&tc.t.stun.server)
+    defer C.free(unsafe.Pointer(str))
+    return C.GoString(str)
 }
 
 func (tc *IceTransportConfig) SetStunServer(s string) {
-    tc.t.stun.server = C.pj_str_t(s)
+    str := C.CString(s)
+    defer C.free(unsafe.Pointer(str))
+    tc.t.stun.server = C.pj_str(str)
 }
 
 // pj_uint16_t port
@@ -92,11 +101,15 @@ func (tc *IceTransportConfig) SetStunPort(u uint16) {
 
 // pj_bool_t ignore_stun_error
 func (tc *IceTransportConfig) GetStunIgnoreStunError() bool {
-    return bool(tc.t.stun.ignore_stun_error)
+    return int(tc.t.stun.ignore_stun_error) != 0
 }
 
 func (tc *IceTransportConfig) SetStunIgnoreStunError(b bool) {
-    tc.t.stun.ignore_stun_error = C.pj_bool_t(b)
+    if b {
+        tc.t.stun.ignore_stun_error = C.pj_bool_t(C.int(1))
+    } else {
+        tc.t.stun.ignore_stun_error = C.pj_bool_t(C.int(0))
+    }
 }
 
 //// turn
@@ -105,11 +118,15 @@ func (tc *IceTransportConfig) SetStunIgnoreStunError(b bool) {
 
 // pj_str_t server
 func (tc *IceTransportConfig) GetTurnServer() string {
-    return string(tc.t.turn.server)
+    str := C.pj_strbuf(&tc.t.turn.server)
+    defer C.free(unsafe.Pointer(str))
+    return C.GoString(str)
 }
 
 func (tc *IceTransportConfig) SetTurnServer(s string) {
-    tc.t.turn.server = C.pj_str_t(s)
+    str := C.CString(s)
+    defer C.free(unsafe.Pointer(str))
+    tc.t.turn.server = C.pj_str(str)
 }
 
 // pj_uint16_t port

@@ -11,7 +11,7 @@ import (
     )
 
 type TurnSockConfig struct {
-    c C.struct_pj_turn_sock_cfg
+    c *C.pj_turn_sock_cfg
 }
 
 func NewTurnSockConfig() *TurnSockConfig {
@@ -21,17 +21,23 @@ func NewTurnSockConfig() *TurnSockConfig {
 }
 
 func (c *TurnSockConfig) SetMaxPacketSize(u uint) {
-    c.c.max_pkg_size = C.uint(u)
+    c.c.max_pkt_size = C.uint(u)
 }
 
 func (c *TurnSockConfig) GetMaxPacketSize() uint {
-    return uint(c.c.max_pkg_size)
+    return uint(c.c.max_pkt_size)
 }
 
-//TODO  BoundAddr string
+func (c *TurnSockConfig) SetBoundAddr(s SockAddr) {
+    c.c.bound_addr = s.s
+}
+
+func (c *TurnSockConfig) GetBoundAddr() *SockAddr {
+    return &SockAddr{c.c.bound_addr}
+}
 
 func (c *TurnSockConfig) SetPortRange(u uint16) {
-    c.c.port_range = C.ushort(u)
+    c.c.port_range = C.pj_uint16_t(u)
 }
 
 func (c *TurnSockConfig) GetPortRange() uint16 {
@@ -39,7 +45,7 @@ func (c *TurnSockConfig) GetPortRange() uint16 {
 }
 
 func (c *TurnSockConfig) SetQosType(u QosType) {
-    c.c.qos_type = C.int(u)
+    c.c.qos_type = C.pj_qos_type(u)
 }
 
 func (c *TurnSockConfig) GetQosType() QosType {
@@ -57,12 +63,16 @@ func (c *TurnSockConfig) GetQosParams() QosParams {
 }
 */
 
-func (c *TurnSockConfig) SetQosIgnoreErr(u bool) {
-    c.c.qos_ignore_error = C.int(u)
+func (c *TurnSockConfig) SetQosIgnoreErr(b bool) {
+    if b {
+        c.c.qos_ignore_error = C.pj_bool_t(C.int(1))
+    } else {
+        c.c.qos_ignore_error = C.pj_bool_t(C.int(0))
+    }
 }
 
 func (c *TurnSockConfig) GetQosIgnoreErr() bool {
-    return bool(c.c.qos_ignore_error)
+    return int(c.c.qos_ignore_error) != 0
 }
 
 func (c *TurnSockConfig) SetRcvbufSize(u uint) {

@@ -21,7 +21,7 @@ const (
     )
 
 type IceSessCand struct {
-    c *C.struct_pj_ice_sess_cand
+    c *C.pj_ice_sess_cand
 }
 
 func (c *IceSessCand) Type() IceCandType {

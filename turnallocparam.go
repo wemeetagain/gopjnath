@@ -11,7 +11,7 @@ import (
     )
 
 type TurnAllocParam struct {
-    t C.struct_pj_turn_alloc_param
+    t *C.pj_turn_alloc_param
 }
 
 func NewTurnAllocParam() *TurnAllocParam {

@@ -4,20 +4,20 @@ package gopjnath
 #include <pjnath.h>
 #include <pjlib-util.h>
 #include <pjlib.h>
+
+void * ice_cb(pj_ice_strans *ice_strans, pj_ice_strans_op op, pj_status_t status);
 */
 import "C"
 
 import (
-    "sync"
     "unsafe"
     )
 
 type IceStreamTransport struct {
-    i     *C.pj_ice_strans
-    cb    *C.pj_ice_strans_cb
-    mutex sync.Mutex // ensure init is only called once
-    init  func() // func that initializes xxx
-    err   error // error returned from xxx
+    i             *C.pj_ice_strans
+    cb            *C.pj_ice_strans_cb
+    OnRxData      func(uint,[]byte,SockAddr)
+    OnIceComplete func(IceTransportOp,error)
 }
 
 // pj_status_t pj_ice_strans_create (const char *name, const pj_ice_strans_cfg *cfg, unsigned comp_cnt, void *user_data, const pj_ice_strans_cb *cb, pj_ice_strans **p_ice_st)
@@ -26,7 +26,7 @@ func NewIceStreamTransport(name string, t IceTransportConfig, compCnt int) (*Ice
     defer C.free(unsafe.Pointer(n))
     cnt := C.uint(compCnt)
     stream := IceStreamTransport{}
-    err := C.pj_ice_strans_create(n,t.t,cnt,unsafe.Pointer(n),stream.cb,&stream.i)
+    err := C.pj_ice_strans_create(n,t.t,cnt,unsafe.Pointer(&stream),stream.cb,&stream.i)
     if err != C.PJ_SUCCESS {
         return &stream, casterr(err)
     }
@@ -54,7 +54,7 @@ func (i *IceStreamTransport) Destroy() error {
 // pj_status_t pj_ice_strans_get_options (pj_ice_strans *ice_st, pj_ice_sess_options *opt)
 func (i *IceStreamTransport) GetOptions() (IceSessOptions,error) {
     o := IceSessOptions{}
-    status := C.pj_ice_strans_get_options(i.i,o.o)
+    status := C.pj_ice_strans_get_options(i.i,&o.o)
     if status != C.PJ_SUCCESS {
         return o, casterr(status)
     }
@@ -63,7 +63,7 @@ func (i *IceStreamTransport) GetOptions() (IceSessOptions,error) {
 
 // pj_status_t pj_ice_strans_set_options (pj_ice_strans *ice_st, const pj_ice_sess_options *opt)
 func (i *IceStreamTransport) SetOptions(o IceSessOptions) error {
-    status := C.pj_ice_strans_set_options(i.i,o.o)
+    status := C.pj_ice_strans_set_options(i.i,&o.o)
     if status != C.PJ_SUCCESS {
         return casterr(status)
     }
@@ -223,4 +223,11 @@ func (i *IceStreamTransport) StopIce() error {
 }    
 
 // pj_status_t pj_ice_strans_sendto (pj_ice_strans *ice_st, unsigned comp_id, const void *data, pj_size_t data_len, const pj_sockaddr_t *dst_addr, int dst_addr_len)
+func (i *IceStreamTransport) Send(compId uint, data []byte, s SockAddr) {
+    
+}
 
+//export go_ice_callback
+func go_ice_callback(i *C.pj_ice_strans,o C.pj_ice_strans_op,s C.pj_status_t) {
+    ((*IceStreamTransport) (C.pj_ice_strans_get_user_data (i))).OnIceComplete(IceTransportOp(o),casterr(s))
+}

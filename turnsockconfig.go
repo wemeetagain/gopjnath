@@ -11,12 +11,12 @@ import (
     )
 
 type TurnSockConfig struct {
-    c *C.pj_turn_sock_cfg
+    c C.pj_turn_sock_cfg
 }
 
-func NewTurnSockConfig() *TurnSockConfig {
-    c := &TurnSockConfig{}
-    C.pj_turn_sock_cfg_default(c.c)
+func NewTurnSockConfig() TurnSockConfig {
+    c := TurnSockConfig{}
+    C.pj_turn_sock_cfg_default(&c.c)
     return c
 }
 

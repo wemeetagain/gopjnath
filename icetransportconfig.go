@@ -8,7 +8,6 @@ package gopjnath
 import "C"
 
 import (
-    "unsafe"
     )
 
 type TurnTransportType int
@@ -35,6 +34,9 @@ func NewIceTransportConfig() *IceTransportConfig {
 func (tc *IceTransportConfig) Copy() {
 }
 
+func (tc *IceTransportConfig) Destroy() {
+}
+
 // struct getters/setters
 
 // int af
@@ -49,15 +51,24 @@ func (tc *IceTransportConfig) SetAf(i int) {
 */
 
 // pj_stun_config stun_cfg
+func (tc *IceTransportConfig) StunConfig() StunConfig {
+    return StunConfig{tc.t.stun_cfg}
+}
 
 // pj_dns_resolver * resolver
 
 // pj_ice_sess_options opt
+func (tc *IceTransportConfig) IceSessOptions() IceSessOptions {
+    return IceSessOptions{tc.t.opt}
+}
 
 //// stun
 
 // pj_stun_sock_cfg cfg
- 
+func (tc *IceTransportConfig) StunSockConfig() StunSockConfig {
+    return StunSockConfig{tc.t.stun.cfg}
+}
+
 // unsigned max_host_cands
 func (tc *IceTransportConfig) GetStunMaxHostCands() uint {
     return uint(tc.t.stun.max_host_cands)
@@ -117,6 +128,9 @@ func (tc *IceTransportConfig) SetStunIgnoreStunError(b bool) {
 //// turn
 
 //pj_turn_sock_cfg cfg
+func (tc *IceTransportConfig) TurnSockConfig() TurnSockConfig {
+    return TurnSockConfig{tc.t.turn.cfg}
+}
 
 // pj_str_t server
 func (tc *IceTransportConfig) GetTurnServer() string {
@@ -160,4 +174,3 @@ func (tc *IceTransportConfig) SetTurnConnType(t TurnTransportType) {
 // unsigned so_rcvbuf_size
 
 // unsigned so_sndbuf_size
-

@@ -11,7 +11,7 @@ import (
     )
 
 type IceSessOptions struct {
-    o *C.pj_ice_sess_options
+    o C.pj_ice_sess_options
 }
 
 func (o *IceSessOptions) SetAggressive(b bool) {

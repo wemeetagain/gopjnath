@@ -11,12 +11,12 @@ import (
     )
 
 type StunSockConfig struct {
-    c *C.pj_stun_sock_cfg
+    c C.pj_stun_sock_cfg
 }
 
-func NewStunSockConfig() *StunSockConfig {
-    c := &StunSockConfig{}
-    C.pj_stun_sock_cfg_default(c.c)
+func NewStunSockConfig() StunSockConfig {
+    c := StunSockConfig{}
+    C.pj_stun_sock_cfg_default(&c.c)
     return c
 }
 

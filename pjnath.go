@@ -45,12 +45,12 @@ func poll() {
     }
 }
 
-type TransportOp int
+type IceTransportOp int
 
 const (
-    TransportOpStateInit        = TransportOp(C.PJ_ICE_STRANS_OP_INIT)
-    TransportOpStateNegotiation = TransportOp(C.PJ_ICE_STRANS_OP_NEGOTIATION)
-    TransportOpStateKeepAlive   = TransportOp(C.PJ_ICE_STRANS_OP_KEEP_ALIVE)
+    IceTransportOpStateInit        = IceTransportOp(C.PJ_ICE_STRANS_OP_INIT)
+    IceTransportOpStateNegotiation = IceTransportOp(C.PJ_ICE_STRANS_OP_NEGOTIATION)
+    IceTransportOpStateKeepAlive   = IceTransportOp(C.PJ_ICE_STRANS_OP_KEEP_ALIVE)
     )
 
 type TransportState int

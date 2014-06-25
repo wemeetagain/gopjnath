@@ -25,9 +25,10 @@ type IceTransportConfig struct {
 
 // void pj_ice_strans_cfg_default (pj_ice_strans_cfg *cfg)
 func NewIceTransportConfig() *IceTransportConfig {
-    tc := &IceTransportConfig{}
-    C.pj_ice_strans_cfg_default(tc.t)
-    return tc
+    var cfg C.pj_ice_strans_cfg
+    C.pj_ice_strans_cfg_default(&cfg)
+    tc := IceTransportConfig{&cfg}
+    return &tc
 }
 
 // void pj_ice_strans_cfg_copy (pj_pool_t *pool, pj_ice_strans_cfg *dst, const pj_ice_strans_cfg *src)
@@ -41,9 +42,11 @@ func (tc *IceTransportConfig) GetAf() int {
     return int(tc.t.af)
 }
 
+/* Currently only pj_AF_INET() (IPv4) is supported, and this is the default value. 
 func (tc *IceTransportConfig) SetAf(i int) {
     tc.t.af = C.int(i)
 }
+*/
 
 // pj_stun_config stun_cfg
 
@@ -79,14 +82,13 @@ func (tc *IceTransportConfig) SetStunLoopAddr(b bool) {
 
 // pj_str_t server
 func (tc *IceTransportConfig) GetStunServer() string {
-    str := C.pj_strbuf(&tc.t.stun.server)
-    defer C.free(unsafe.Pointer(str))
-    return C.GoString(str)
+    str := toString(tc.t.stun.server)
+    return str
 }
 
 func (tc *IceTransportConfig) SetStunServer(s string) {
+    destroyString(tc.t.stun.server)
     str := C.CString(s)
-    defer C.free(unsafe.Pointer(str))
     tc.t.stun.server = C.pj_str(str)
 }
 
@@ -118,14 +120,12 @@ func (tc *IceTransportConfig) SetStunIgnoreStunError(b bool) {
 
 // pj_str_t server
 func (tc *IceTransportConfig) GetTurnServer() string {
-    str := C.pj_strbuf(&tc.t.turn.server)
-    defer C.free(unsafe.Pointer(str))
-    return C.GoString(str)
-}
+    str := toString(tc.t.turn.server)
+    return str}
 
 func (tc *IceTransportConfig) SetTurnServer(s string) {
+    destroyString(tc.t.turn.server)
     str := C.CString(s)
-    defer C.free(unsafe.Pointer(str))
     tc.t.turn.server = C.pj_str(str)
 }
 
@@ -160,6 +160,4 @@ func (tc *IceTransportConfig) SetTurnConnType(t TurnTransportType) {
 // unsigned so_rcvbuf_size
 
 // unsigned so_sndbuf_size
-
-
 

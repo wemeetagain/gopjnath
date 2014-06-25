@@ -17,7 +17,7 @@ type cachingPool unsafe.Pointer
 
 // TODO make init ... better
 var (
-    cp *C.pj_caching_pool
+    cp C.pj_caching_pool
     pool *C.pj_pool_t
     tHeap *C.pj_timer_heap_t
     io *C.pj_ioqueue_t
@@ -28,10 +28,10 @@ func init() {
     C.pj_init()
     C.pjlib_util_init()
     C.pjnath_init()
-    C.pj_caching_pool_init(cp, &C.pj_pool_factory_default_policy, 0)
+    C.pj_caching_pool_init(&cp, &C.pj_pool_factory_default_policy, C.pj_size_t(0))
     str := C.CString("main")
     defer C.free(unsafe.Pointer(str))
-    pool = C.pj_pool_create(&cp.factory,str,512,512,nil)
+    pool = C.pj_pool_create(&cp.factory,str,C.pj_size_t(1000),C.pj_size_t(1000),nil)
     C.pj_timer_heap_create(pool,C.pj_size_t(1000),&tHeap)
     C.pj_ioqueue_create(pool,C.pj_size_t(16),&io)
 }
@@ -89,4 +89,23 @@ func casterr(err C.pj_status_t) error {
     str := C.pj_strbuf(&s)
     defer C.free(unsafe.Pointer(str))
     return errors.New(C.GoString(str))
+}
+
+func toString(s C.pj_str_t) string {
+    str := C.pj_strbuf(&s)
+    ptr := uintptr(unsafe.Pointer(str))
+    var str2 = unsafe.Pointer( C.calloc( C.size_t(C.pj_strlen(&s) + 1), 1 ) )
+    ptr2 := uintptr(str2)
+    for i := 0; i < int(C.pj_strlen(&s)); i++ {
+        *(*C.char) (unsafe.Pointer(ptr2)) = *(*C.char) (unsafe.Pointer(ptr))
+        ptr++
+        ptr2++
+    }
+    defer C.free(str2)
+    return C.GoString((*C.char)(str2))
+}
+
+func destroyString(s C.pj_str_t) {
+    str := C.pj_strbuf(&s)
+    C.free(unsafe.Pointer(str))
 }

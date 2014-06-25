@@ -13,7 +13,7 @@ import (
     )
 
 type IceStreamTransport struct {
-    i     *[0]byte
+    i     *C.pj_ice_strans
     cb    *C.pj_ice_strans_cb
     mutex sync.Mutex // ensure init is only called once
     init  func() // func that initializes xxx

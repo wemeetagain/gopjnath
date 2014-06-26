@@ -231,3 +231,17 @@ func (i *IceStreamTransport) Send(compId uint, data []byte, s SockAddr) {
 func go_ice_callback(i *C.pj_ice_strans,o C.pj_ice_strans_op,s C.pj_status_t) {
     ((*IceStreamTransport) (C.pj_ice_strans_get_user_data (i))).OnIceComplete(IceTransportOp(o),casterr(s))
 }
+
+//export go_data_callback
+func go_data_callback(i *C.pj_ice_strans, comp_id C.unsigned, pkt unsafe.Pointer, size C.pj_size_t, src_addr *C.pj_sockaddr_t, src_addr_len C.unsigned) {
+    sz := int(size)
+    data := make([]byte,sz)
+    data_ptr := uintptr(pkt)
+    for index := 0; index < sz; index++ {
+        data[index] = *((*byte) (unsafe.Pointer(data_ptr)))
+        data_ptr++
+    }
+    //TODO make ral SockAddr
+    s := SockAddr{}
+    ((*IceStreamTransport) (C.pj_ice_strans_get_user_data (i))).OnRxData(uint(comp_id),data,s)
+}

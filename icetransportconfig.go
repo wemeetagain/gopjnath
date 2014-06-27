@@ -23,9 +23,10 @@ type IceTransportConfig struct {
 }
 
 // void pj_ice_strans_cfg_default (pj_ice_strans_cfg *cfg)
-func NewIceTransportConfig() *IceTransportConfig {
+func NewIceTransportConfig(c *Context) *IceTransportConfig {
     var cfg C.pj_ice_strans_cfg
     C.pj_ice_strans_cfg_default(&cfg)
+    C.pj_stun_config_init(&cfg.stun_cfg,&c.cp.factory,0,c.io,c.tHeap)
     tc := IceTransportConfig{&cfg}
     return &tc
 }

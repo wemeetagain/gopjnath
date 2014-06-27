@@ -15,33 +15,42 @@ import (
 
 type cachingPool unsafe.Pointer
 
-// TODO make init ... better
-var (
-    cp C.pj_caching_pool
+type Context struct {
+	cp C.pj_caching_pool
     pool *C.pj_pool_t
     tHeap *C.pj_timer_heap_t
     io *C.pj_ioqueue_t
     quit bool
-    )
+}
+
+func NewContext(name string) *Context {
+	c := Context{}
+	C.pj_caching_pool_init(&c.cp, &C.pj_pool_factory_default_policy, C.pj_size_t(10))
+    str := C.CString(name)
+    c.pool = C.pj_pool_create(&c.cp.factory,str,C.pj_size_t(1000),C.pj_size_t(1000),nil)
+    C.pj_timer_heap_create(c.pool,C.pj_size_t(1000),&c.tHeap)
+    C.pj_ioqueue_create(c.pool,C.pj_size_t(16),&c.io)
+    go c.poll()
+    return &c
+}
+
+func (c *Context) Destroy() {
+	//C.free(unsafe.Pointer(str))
+	c.quit = true
+}
 
 func init() {
     C.pj_init()
     C.pjlib_util_init()
     C.pjnath_init()
-    C.pj_caching_pool_init(&cp, &C.pj_pool_factory_default_policy, C.pj_size_t(0))
-    str := C.CString("main")
-    defer C.free(unsafe.Pointer(str))
-    pool = C.pj_pool_create(&cp.factory,str,C.pj_size_t(1000),C.pj_size_t(1000),nil)
-    C.pj_timer_heap_create(pool,C.pj_size_t(1000),&tHeap)
-    C.pj_ioqueue_create(pool,C.pj_size_t(16),&io)
 }
 
-func poll() {
+func (c *Context) poll() {
     var delay C.pj_time_val
     delay.msec = C.long(10)
-    for !quit {
-        C.pj_ioqueue_poll(io,&delay)
-        C.pj_timer_heap_poll(tHeap,nil)
+    for !c.quit {
+        C.pj_ioqueue_poll(c.io,&delay)
+        C.pj_timer_heap_poll(c.tHeap,nil)
     }
 }
 

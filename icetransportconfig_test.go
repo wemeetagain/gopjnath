@@ -6,7 +6,8 @@ import (
     )
   
 func TestIceTransportConfig(t *testing.T) {
-    c := NewIceTransportConfig()
+	context := NewContext("test_IceTransportConfig")
+    c := NewIceTransportConfig(context)
     c.SetStunMaxHostCands(uint(10))
     // stun max host cands (uint)
     if a := c.GetStunMaxHostCands(); a != uint(10) {

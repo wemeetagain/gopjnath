@@ -7,10 +7,12 @@ package gopjnath
 
 void * ice_cb(pj_ice_strans *ice_strans, pj_ice_strans_op op, pj_status_t status);
 void * data_cb(pj_ice_strans *ice_st, unsigned comp_id, void *pkt, pj_size_t size, const pj_sockaddr_t *src_addr, unsigned src_addr_len);
+pj_ice_strans_cb *new_cb(void *ice, void *data);
 */
 import "C"
 
 import (
+	"log"
     "unsafe"
     )
 
@@ -25,11 +27,12 @@ type IceStreamTransport struct {
 func NewIceStreamTransport(name string, t IceTransportConfig, compCnt uint) (*IceStreamTransport, error) {
     n := C.CString(name)
     defer C.free(unsafe.Pointer(n))
-    cnt := C.uint(compCnt)
     stream := IceStreamTransport{}
-    stream.cb.on_ice_complete = (*[0]byte) (C.ice_cb)
-    stream.cb.on_rx_data = (*[0]byte) (C.data_cb)
-    err := C.pj_ice_strans_create(n,t.t,cnt,unsafe.Pointer(&stream),stream.cb,&stream.i)
+    stream.cb = C.new_cb(C.ice_cb,C.data_cb)
+    log.Println(stream.cb)
+    //stream.cb.on_ice_complete = (*[0]byte) (uintptr(C.ice_cb))
+    //stream.cb.on_rx_data = (*[0]byte) (uintptr(C.data_cb))
+    err := C.pj_ice_strans_create(n, t.t, C.uint(compCnt), unsafe.Pointer(&stream), stream.cb, &stream.i)
     if err != C.PJ_SUCCESS {
         return &stream, casterr(err)
     }

@@ -24,10 +24,22 @@ type IceStreamTransport struct {
 }
 
 // pj_status_t pj_ice_strans_create (const char *name, const pj_ice_strans_cfg *cfg, unsigned comp_cnt, void *user_data, const pj_ice_strans_cb *cb, pj_ice_strans **p_ice_st)
-func NewIceStreamTransport(name string, t IceTransportConfig, compCnt uint) (*IceStreamTransport, error) {
+func NewIceStreamTransport(name string, t IceTransportConfig, compCnt uint, dataCallback func(uint,[]byte,SockAddr), iceCallback func(IceTransportOp,error)) (*IceStreamTransport, error) {
     n := C.CString(name)
     defer C.free(unsafe.Pointer(n))
-    stream := IceStreamTransport{}
+    var dcb func(uint,[]byte,SockAddr)
+    var icb func(IceTransportOp,error)
+    if dataCallback != nil {
+		dcb = dataCallback
+	} else {
+		dcb = defaultDataCallback
+	}
+	if iceCallback != nil {
+		icb = iceCallback
+	} else {
+		icb = defaultIceCallback
+	}
+    stream := IceStreamTransport{OnRxData:dcb,OnIceComplete:icb}
     stream.cb = C.new_cb(C.ice_cb,C.data_cb)
     log.Println(stream.cb)
     //stream.cb.on_ice_complete = (*[0]byte) (uintptr(C.ice_cb))
@@ -235,7 +247,8 @@ func (i *IceStreamTransport) Send(compId uint, data []byte, s SockAddr) {
 
 //export go_ice_callback
 func go_ice_callback(i *C.pj_ice_strans,o C.pj_ice_strans_op,s C.pj_status_t) {
-    ((*IceStreamTransport) (C.pj_ice_strans_get_user_data (i))).OnIceComplete(IceTransportOp(o),casterr(s))
+	strans := (*IceStreamTransport) (C.pj_ice_strans_get_user_data (i))
+    strans.OnIceComplete(IceTransportOp(o),casterr(s))
 }
 
 //export go_data_callback
@@ -250,4 +263,10 @@ func go_data_callback(i *C.pj_ice_strans, comp_id C.unsigned, pkt unsafe.Pointer
     //TODO make ral SockAddr
     s := SockAddr{}
     ((*IceStreamTransport) (C.pj_ice_strans_get_user_data (i))).OnRxData(uint(comp_id),data,s)
+}
+
+func defaultDataCallback(compId uint,data []byte,addr SockAddr) {
+}
+
+func defaultIceCallback(op IceTransportOp, err error) {
 }

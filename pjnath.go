@@ -5,8 +5,6 @@ package gopjnath
 #include <pjlib.h>
 #include <pjlib-util.h>
 #include <pjnath.h>
-
-void poll(int *quit,long *delay,pj_ioqueue_t *io, pj_timer_heap_t *theap);
 */
 import "C"
 
@@ -29,28 +27,6 @@ type Context struct {
     io *C.pj_ioqueue_t
     poll *C.pj_thread_t
     quit *C.int
-}
-
-func NewContext(name string) *Context {
-	c := Context{}
-	c.name = C.CString(name)
-	
-	C.pj_caching_pool_init(&c.cp, &C.pj_pool_factory_default_policy, C.pj_size_t(10))
-    c.pool = C.pj_pool_create(&c.cp.factory,c.name,C.pj_size_t(1000),C.pj_size_t(1000),nil)
-    C.pj_timer_heap_create(c.pool,C.pj_size_t(1000),&c.tHeap)
-    C.pj_ioqueue_create(c.pool,C.pj_size_t(16),&c.io)
-    
-    // set up polling
-    pollArgs := C.malloc(C.size_t(4))
-    
-    C.pj_thread_create(c.pool,c.name,(*C.pj_thread_proc) (C.poll),pollArgs,0,0,&c.poll)
-    //go c.poll()
-    return &c
-}
-
-func (c *Context) Destroy() {
-	C.free(unsafe.Pointer(c.name))
-	//c.quit = &C.int(1)
 }
 
 /*
@@ -103,8 +79,8 @@ const (
     )
 
 func casterr(err C.pj_status_t) error {
-    var buf *C.char
-    s := C.pj_strerror(err,buf,80)
+    buf := unsafe.Pointer(C.calloc(80,1))
+    s := C.pj_strerror(err,(*C.char) (buf),80)
     str := C.pj_strbuf(&s)
     defer C.free(unsafe.Pointer(str))
     return errors.New(C.GoString(str))

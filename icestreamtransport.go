@@ -12,7 +12,7 @@ pj_ice_strans_cb *new_cb(void *ice, void *data);
 import "C"
 
 import (
-	"log"
+	//"log"
     "unsafe"
     )
 
@@ -41,7 +41,6 @@ func NewIceStreamTransport(name string, t IceTransportConfig, compCnt uint, data
 	}
     stream := IceStreamTransport{OnRxData:dcb,OnIceComplete:icb}
     stream.cb = C.new_cb(C.ice_cb,C.data_cb)
-    log.Println(stream.cb)
     //stream.cb.on_ice_complete = (*[0]byte) (uintptr(C.ice_cb))
     //stream.cb.on_rx_data = (*[0]byte) (uintptr(C.data_cb))
     err := C.pj_ice_strans_create(n, t.t, C.uint(compCnt), unsafe.Pointer(&stream), stream.cb, &stream.i)
@@ -58,7 +57,9 @@ func (i *IceStreamTransport) GetState() TransportState {
 
 // const char * pj_ice_strans_state_name (pj_ice_strans_state state)
 func GetTransportStateName(t TransportState) string {
-    return C.GoString(C.pj_ice_strans_state_name(C.pj_ice_strans_state(t)))
+    str := C.pj_ice_strans_state_name(C.pj_ice_strans_state(t))
+    //defer C.free(unsafe.Pointer(str))
+    return C.GoString(str)
 }
 
 // pj_status_t pj_ice_strans_destroy (pj_ice_strans *ice_st)
@@ -241,8 +242,19 @@ func (i *IceStreamTransport) StopIce() error {
 }    
 
 // pj_status_t pj_ice_strans_sendto (pj_ice_strans *ice_st, unsigned comp_id, const void *data, pj_size_t data_len, const pj_sockaddr_t *dst_addr, int dst_addr_len)
-func (i *IceStreamTransport) Send(compId uint, data []byte, s SockAddr) {
-    
+func (i *IceStreamTransport) Send(compId uint, data []byte, s SockAddr) error {
+    d := unsafe.Pointer(C.malloc(len(data)))
+    d_ptr := uintptr(d)
+    for _, b := range data {
+		(C.uchar) (unsafe.Pointer(d_ptr)) = b
+	}
+	sct := unsafe.Pointer(C.malloc(C.sizeof(s.s)))
+	sct = s.s
+	err := C.pj_ice_strans_sendto(i.i, C.uint(compId), d, C.pj_size_t(len(data)), (*C.pj_sockaddr_t) (sct), C.int(C.sizeof(s.s)))
+    if status != C.PJ_SUCCESS {
+        return casterr(status)
+    }
+    return nil
 }
 
 //export go_ice_callback

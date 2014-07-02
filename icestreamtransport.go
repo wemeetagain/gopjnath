@@ -243,16 +243,17 @@ func (i *IceStreamTransport) StopIce() error {
 
 // pj_status_t pj_ice_strans_sendto (pj_ice_strans *ice_st, unsigned comp_id, const void *data, pj_size_t data_len, const pj_sockaddr_t *dst_addr, int dst_addr_len)
 func (i *IceStreamTransport) Send(compId uint, data []byte, s SockAddr) error {
-    d := unsafe.Pointer(C.malloc(len(data)))
+    d := unsafe.Pointer(C.malloc(C.size_t(len(data))))
     d_ptr := uintptr(d)
+    _ = d_ptr
     for _, b := range data {
-		(C.uchar) (unsafe.Pointer(d_ptr)) = b
+		*(*C.uchar) (unsafe.Pointer(d_ptr)) = C.uchar(b)
 	}
-	sct := unsafe.Pointer(C.malloc(C.sizeof(s.s)))
-	sct = s.s
-	err := C.pj_ice_strans_sendto(i.i, C.uint(compId), d, C.pj_size_t(len(data)), (*C.pj_sockaddr_t) (sct), C.int(C.sizeof(s.s)))
-    if status != C.PJ_SUCCESS {
-        return casterr(status)
+	sct := unsafe.Pointer(C.malloc(C.size_t(28)))
+	sct = unsafe.Pointer(&s.s)
+	err := C.pj_ice_strans_sendto(i.i, C.uint(compId), d, C.pj_size_t(len(data)), sct, C.int(28))
+    if err != C.PJ_SUCCESS {
+        return casterr(err)
     }
     return nil
 }

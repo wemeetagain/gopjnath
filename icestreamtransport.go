@@ -131,18 +131,31 @@ func (i *IceStreamTransport) GetRunningCompCount() uint {
 func (i *IceStreamTransport) GetUfragPwd() (string, string, string, string, error) {
     var locUfrag, locPwd, remUfrag, remPwd *C.pj_str_t
     status := C.pj_ice_strans_get_ufrag_pwd(i.i,locUfrag, locPwd, remUfrag, remPwd)
-    lu := C.pj_strbuf(locUfrag)
-    lp := C.pj_strbuf(locPwd)
-    ru := C.pj_strbuf(remUfrag)
-    rp := C.pj_strbuf(remPwd)
-    defer C.free(unsafe.Pointer(lu))
-    defer C.free(unsafe.Pointer(lp))
-    defer C.free(unsafe.Pointer(ru))
-    defer C.free(unsafe.Pointer(rp))
+    var lu, lp, ru, rp string
+    /*
+    if locUfrag != nil {
+		lu = toString(*locUfrag)
+	}
+	if locPwd != nil {
+		lp = toString(*locPwd)
+	}
+	if remUfrag != nil {
+		ru = toString(*remUfrag)
+	}
+	if remPwd != nil {
+		rp = toString(*remPwd)
+	}
+	*/
+	lu = ptrToString(unsafe.Pointer(locUfrag))
+	lp = ptrToString(unsafe.Pointer(locPwd))
+	ru = ptrToString(unsafe.Pointer(remUfrag))
+	rp = ptrToString(unsafe.Pointer(remPwd))
+
+	
     if status != C.PJ_SUCCESS {
-        return C.GoString(lu), C.GoString(lp), C.GoString(ru), C.GoString(rp), casterr(status)
+        return lu,lp,ru,rp, casterr(status)
     }
-    return C.GoString(lu), C.GoString(lp), C.GoString(ru), C.GoString(rp), nil
+    return lu,lp,ru,rp, nil
 }
 
 // unsigned pj_ice_strans_get_cands_count (pj_ice_strans *ice_st, unsigned comp_id)

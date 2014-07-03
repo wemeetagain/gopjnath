@@ -105,6 +105,20 @@ func toString(s C.pj_str_t) string {
     return C.GoString((*C.char)(str2))
 }
 
+func ptrToString(s unsafe.Pointer) string {
+    str := C.pj_strbuf((*C.pj_str_t) (s))
+    ptr := uintptr(unsafe.Pointer(str))
+    var str2 = unsafe.Pointer( C.calloc( C.size_t(C.pj_strlen((*C.pj_str_t) (s)) + 1), 1 ) )
+    ptr2 := uintptr(str2)
+    for i := 0; i < int(C.pj_strlen((*C.pj_str_t) (s))); i++ {
+        *(*C.char) (unsafe.Pointer(ptr2)) = *(*C.char) (unsafe.Pointer(ptr))
+        ptr++
+        ptr2++
+    }
+    defer C.free(str2)
+    return C.GoString((*C.char)(str2))
+}
+
 func destroyString(s C.pj_str_t) {
     str := C.pj_strbuf(&s)
     C.free(unsafe.Pointer(str))

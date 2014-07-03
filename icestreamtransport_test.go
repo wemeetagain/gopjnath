@@ -3,6 +3,7 @@ package gopjnath
 import (
     //"fmt"
     "testing"
+    //"time"
     )
 
 var tester *testing.T
@@ -18,13 +19,47 @@ func TestIceTransport(t *testing.T) {
     tester = t
     context := NewContext("test")
     c := NewIceTransportConfig(context)
+    c.SetStunServer("203.183.172.196")
+    c.SetStunPort(3478)
     trans,err := NewIceStreamTransport("test",*c,1,nil,testIceCallback)
     if err != nil {
         t.Fatalf("NewIceStreamTransport error: %s",err)
     }
     _ = trans
     stt := trans.GetState()
+    if stt != 1 {
+        t.Fatalf("GetState should return 1, returned: %d",stt)
+    }
     t.Logf("GetState: %d",stt)
     t.Logf("State Name: %s",GetTransportStateName(stt))
-    
+    //time.Sleep(10*time.Second)
+    hassess := trans.HasSess()
+    if hassess != false {
+        t.Fatalf("GetState should return false, returned: %d",hassess)
+    }
+    t.Logf("HasSess: %t",hassess)
+    sisrun := trans.SessIsRunning()
+    if sisrun != false {
+        t.Fatalf("SessIsRunning should return false, returned: %d",sisrun)
+    }
+    t.Logf("SessIsRunning: %t",sisrun)
+    siscom := trans.SessIsComplete()
+    if siscom != false {
+        t.Fatalf("SessIsComplete should return false, returned: %d",siscom)
+    }
+    t.Logf("SessIsComplete: %t",siscom)
+    testufrag := "testufrag"
+    testpwd := "testpwd"
+    err = trans.InitIce(IceSessRoleControlling,testufrag,testpwd)
+    if err != nil {
+        t.Fatalf("StartIce error: %s",err)
+    }
+    // run after ice starts otherwise, boom
+    lu,lp, ru, rp, err := trans.GetUfragPwd()
+    if err != nil {
+        t.Fatalf("GetUfragPwd error: %s",err)
+    }
+    t.Logf("GetUfragPwd: %s %s %s %s",lu,lp,ru,rp)
+    numCands := trans.GetCandsCount(1)
+    t.Fatalf("GetCandCount: %d",numCands)
 }

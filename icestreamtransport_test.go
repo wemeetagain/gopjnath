@@ -26,26 +26,26 @@ func TestIceTransport(t *testing.T) {
         t.Fatalf("NewIceStreamTransport error: %s",err)
     }
     _ = trans
-    stt := trans.GetState()
+    stt := trans.State()
     if stt != 1 {
-        t.Fatalf("GetState should return 1, returned: %d",stt)
+        t.Fatalf("State should return 1, returned: %d",stt)
     }
-    t.Logf("GetState: %d",stt)
-    t.Logf("State Name: %s",GetTransportStateName(stt))
+    t.Logf("State: %d",stt)
+    t.Logf("State Name: %s",TransportStateName(stt))
     //time.Sleep(10*time.Second)
     hassess := trans.HasSess()
     if hassess != false {
-        t.Fatalf("GetState should return false, returned: %d",hassess)
+        t.Fatalf("HassSess should return false, returned: %t",hassess)
     }
     t.Logf("HasSess: %t",hassess)
     sisrun := trans.SessIsRunning()
     if sisrun != false {
-        t.Fatalf("SessIsRunning should return false, returned: %d",sisrun)
+        t.Fatalf("SessIsRunning should return false, returned: %t",sisrun)
     }
     t.Logf("SessIsRunning: %t",sisrun)
     siscom := trans.SessIsComplete()
     if siscom != false {
-        t.Fatalf("SessIsComplete should return false, returned: %d",siscom)
+        t.Fatalf("SessIsComplete should return false, returned: %t",siscom)
     }
     t.Logf("SessIsComplete: %t",siscom)
     testufrag := "testufrag"
@@ -55,11 +55,11 @@ func TestIceTransport(t *testing.T) {
         t.Fatalf("StartIce error: %s",err)
     }
     // run after ice starts otherwise, boom
-    lu,lp, ru, rp, err := trans.GetUfragPwd()
+    lu,lp, ru, rp, err := trans.UfragPwd()
     if err != nil {
-        t.Fatalf("GetUfragPwd error: %s",err)
+        t.Fatalf("UfragPwd error: %s",err)
     }
-    t.Logf("GetUfragPwd: %s %s %s %s",lu,lp,ru,rp)
-    numCands := trans.GetCandsCount(1)
-    t.Fatalf("GetCandCount: %d",numCands)
+    t.Logf("UfragPwd: %s %s %s %s",lu,lp,ru,rp)
+    numCands := trans.CandsCount(1)
+    t.Fatalf("CandCount: %d",numCands)
 }

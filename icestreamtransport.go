@@ -51,12 +51,12 @@ func NewIceStreamTransport(name string, t IceTransportConfig, compCnt uint, data
 }
 
 // pj_ice_strans_state pj_ice_strans_get_state (pj_ice_strans *ice_st)
-func (i *IceStreamTransport) GetState() TransportState {
+func (i *IceStreamTransport) State() TransportState {
     return TransportState(C.pj_ice_strans_get_state(i.i))
 }
 
 // const char * pj_ice_strans_state_name (pj_ice_strans_state state)
-func GetTransportStateName(t TransportState) string {
+func TransportStateName(t TransportState) string {
     str := C.pj_ice_strans_state_name(C.pj_ice_strans_state(t))
     //defer C.free(unsafe.Pointer(str))
     return C.GoString(str)
@@ -71,7 +71,7 @@ func (i *IceStreamTransport) Destroy() error {
 // not implementing right now :)
 
 // pj_status_t pj_ice_strans_get_options (pj_ice_strans *ice_st, pj_ice_sess_options *opt)
-func (i *IceStreamTransport) GetOptions() (IceSessOptions,error) {
+func (i *IceStreamTransport) Options() (IceSessOptions,error) {
     o := IceSessOptions{}
     status := C.pj_ice_strans_get_options(i.i,&o.o)
     if status != C.PJ_SUCCESS {
@@ -123,16 +123,15 @@ func (i *IceStreamTransport) SessIsComplete() bool {
 }
 
 // unsigned pj_ice_strans_get_running_comp_cnt (pj_ice_strans *ice_st)
-func (i *IceStreamTransport) GetRunningCompCount() uint {
+func (i *IceStreamTransport) RunningCompCount() uint {
     return uint(C.pj_ice_strans_get_running_comp_cnt(i.i))
 }
 
 // pj_status_t pj_ice_strans_get_ufrag_pwd (pj_ice_strans *ice_st, pj_str_t *loc_ufrag, pj_str_t *loc_pwd, pj_str_t *rem_ufrag, pj_str_t *rem_pwd)
-func (i *IceStreamTransport) GetUfragPwd() (string, string, string, string, error) {
+func (i *IceStreamTransport) UfragPwd() (string, string, string, string, error) {
     var locUfrag, locPwd, remUfrag, remPwd *C.pj_str_t
     status := C.pj_ice_strans_get_ufrag_pwd(i.i,locUfrag, locPwd, remUfrag, remPwd)
     var lu, lp, ru, rp string
-    /*
     if locUfrag != nil {
 		lu = toString(*locUfrag)
 	}
@@ -145,12 +144,6 @@ func (i *IceStreamTransport) GetUfragPwd() (string, string, string, string, erro
 	if remPwd != nil {
 		rp = toString(*remPwd)
 	}
-	*/
-	lu = ptrToString(unsafe.Pointer(locUfrag))
-	lp = ptrToString(unsafe.Pointer(locPwd))
-	ru = ptrToString(unsafe.Pointer(remUfrag))
-	rp = ptrToString(unsafe.Pointer(remPwd))
-
 	
     if status != C.PJ_SUCCESS {
         return lu,lp,ru,rp, casterr(status)
@@ -159,7 +152,7 @@ func (i *IceStreamTransport) GetUfragPwd() (string, string, string, string, erro
 }
 
 // unsigned pj_ice_strans_get_cands_count (pj_ice_strans *ice_st, unsigned comp_id)
-func (i *IceStreamTransport) GetCandsCount(compId uint) uint {
+func (i *IceStreamTransport) CandsCount(compId uint) uint {
     return uint(C.pj_ice_strans_get_cands_count(i.i,C.uint(compId)))
 }
 
@@ -186,7 +179,7 @@ func (i *IceStreamTransport) GetCands(compId uint) ([]IceSessCand, error) {
 }
 
 // pj_status_t pj_ice_strans_get_def_cand (pj_ice_strans *ice_st, unsigned comp_id, pj_ice_sess_cand *cand)
-func (i *IceStreamTransport) GetCand(compId uint) (IceSessCand, error) {
+func (i *IceStreamTransport) Cand(compId uint) (IceSessCand, error) {
     id := C.uint(compId)
     cand := IceSessCand{}
     status := C.pj_ice_strans_get_def_cand(i.i,id,cand.c)
@@ -240,7 +233,7 @@ func (i *IceStreamTransport) StartIce(remUfrag,remPwd string, count uint, cands 
 }
 
 // const pj_ice_sess_check * pj_ice_strans_get_valid_pair (const pj_ice_strans *ice_st, unsigned comp_id)
-func (i *IceStreamTransport) GetValidPair(compId uint) IceSessCheck {
+func (i *IceStreamTransport) ValidPair(compId uint) IceSessCheck {
     return IceSessCheck{C.pj_ice_strans_get_valid_pair(i.i,C.uint(compId))}
 }
 

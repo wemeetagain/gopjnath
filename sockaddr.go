@@ -13,6 +13,7 @@ import (
     "net"
     )
 
+// SockAddr describes a generic socket address. 
 type SockAddr struct {
     s C.union_pj_sockaddr
 }
@@ -29,6 +30,27 @@ func (s *SockAddr) IP() net.IP {
     return nil
 }
 
+func (s *SockAddr) SetIP(ip net.IP, ipv6 bool) error {
+	if ipv6 {
+		data, err := ip.To16().MarshalText()
+		if err != nil {
+			return err
+		}
+		copy(s.s[8:24], data)
+	} else {
+		data, err := ip.To4().MarshalText()
+		if err != nil {
+			return err
+		}
+		copy(s.s[4:8], data)
+	}
+	return nil
+}
+
 func (s *SockAddr) Port() uint16 {
     return binary.LittleEndian.Uint16(s.s[2:4])
+}
+
+func (s *SockAddr) SetPort(i uint16) {
+    binary.LittleEndian.PutUint16(s.s[2:4], i)
 }

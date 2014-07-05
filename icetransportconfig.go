@@ -41,7 +41,7 @@ func (tc *IceTransportConfig) Destroy() {
 // struct getters/setters
 
 // int af
-func (tc *IceTransportConfig) GetAf() int {
+func (tc *IceTransportConfig) Af() int {
     return int(tc.t.af)
 }
 
@@ -71,7 +71,7 @@ func (tc *IceTransportConfig) StunSockConfig() StunSockConfig {
 }
 
 // unsigned max_host_cands
-func (tc *IceTransportConfig) GetStunMaxHostCands() uint {
+func (tc *IceTransportConfig) StunMaxHostCands() uint {
     return uint(tc.t.stun.max_host_cands)
 }
 
@@ -80,7 +80,7 @@ func (tc *IceTransportConfig) SetStunMaxHostCands(u uint) {
 }
 
 // pj_bool_t loop_addr
-func (tc *IceTransportConfig) GetStunLoopAddr() bool {
+func (tc *IceTransportConfig) StunLoopAddr() bool {
     return int(tc.t.stun.loop_addr) != 0
 }
 
@@ -93,7 +93,7 @@ func (tc *IceTransportConfig) SetStunLoopAddr(b bool) {
 }
 
 // pj_str_t server
-func (tc *IceTransportConfig) GetStunServer() string {
+func (tc *IceTransportConfig) StunServer() string {
     str := toString(tc.t.stun.server)
     return str
 }
@@ -105,7 +105,7 @@ func (tc *IceTransportConfig) SetStunServer(s string) {
 }
 
 // pj_uint16_t port
-func (tc *IceTransportConfig) GetStunPort() uint16 {
+func (tc *IceTransportConfig) StunPort() uint16 {
     return uint16(tc.t.stun.port)
 }
 
@@ -114,7 +114,7 @@ func (tc *IceTransportConfig) SetStunPort(u uint16) {
 }
 
 // pj_bool_t ignore_stun_error
-func (tc *IceTransportConfig) GetStunIgnoreStunError() bool {
+func (tc *IceTransportConfig) StunIgnoreStunError() bool {
     return int(tc.t.stun.ignore_stun_error) != 0
 }
 
@@ -134,7 +134,7 @@ func (tc *IceTransportConfig) TurnSockConfig() TurnSockConfig {
 }
 
 // pj_str_t server
-func (tc *IceTransportConfig) GetTurnServer() string {
+func (tc *IceTransportConfig) TurnServer() string {
     str := toString(tc.t.turn.server)
     return str}
 
@@ -145,7 +145,7 @@ func (tc *IceTransportConfig) SetTurnServer(s string) {
 }
 
 // pj_uint16_t port
-func (tc *IceTransportConfig) GetTurnPort() uint16 {
+func (tc *IceTransportConfig) TurnPort() uint16 {
     return uint16(tc.t.turn.port)
 }
 
@@ -154,7 +154,7 @@ func (tc *IceTransportConfig) SetTurnPort(u uint16) {
 }
 
 // pj_turn_tp_type conn_type
-func (tc *IceTransportConfig) GetTurnConnType() TurnTransportType {
+func (tc *IceTransportConfig) TurnConnType() TurnTransportType {
     return TurnTransportType(tc.t.turn.conn_type)
 }
 

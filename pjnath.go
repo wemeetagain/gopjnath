@@ -79,16 +79,14 @@ const (
     )
 
 func casterr(err C.pj_status_t) error {
+	if err == C.PJ_SUCCESS {
+        return nil
+    }
     buf := unsafe.Pointer(C.calloc(80,1))
     s := C.pj_strerror(err,(*C.char) (buf),80)
     str := C.pj_strbuf(&s)
     defer C.free(unsafe.Pointer(str))
-    newError := errors.New(C.GoString(str))
-    if newError.Error() == "Success" {
-		return nil
-	} else {
-		return newError
-	}
+    return errors.New(C.GoString(str))
 }
 
 func toString(s C.pj_str_t) string {

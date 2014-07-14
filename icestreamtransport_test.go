@@ -19,6 +19,15 @@ func TestIceTransport(t *testing.T) {
     tester = t
     context := NewContext("test")
     c := NewIceTransportConfig(context)
+    dns,err := context.NewDnsResolver()
+    if err != nil {
+        t.Fatalf("NewDnsResolver error: %s",err)
+    }
+    err = dns.SetNs("8.8.8.8")
+    if err != nil {
+        t.Fatalf("SetNs error: %s",err)
+    }
+    c.SetDnsResolver(dns)
     c.SetStunServer("203.183.172.196")
     c.SetStunPort(3478)
     trans,err := NewIceStreamTransport("test",*c,1,nil,testIceCallback)

@@ -8,6 +8,15 @@ import (
 func TestIceTransportConfig(t *testing.T) {
 	context := NewContext("test_IceTransportConfig")
     c := NewIceTransportConfig(context)
+        dns,err := context.NewDnsResolver()
+    if err != nil {
+        t.Fatalf("NewDnsResolver error: %s",err)
+    }
+    err = dns.SetNs("8.8.8.8")
+    if err != nil {
+        t.Fatalf("SetNs error: %s",err)
+    }
+    c.SetDnsResolver(dns)
     c.SetStunMaxHostCands(uint(10))
     // stun max host cands (uint)
     if a := c.StunMaxHostCands(); a != uint(10) {

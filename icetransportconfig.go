@@ -57,6 +57,13 @@ func (tc *IceTransportConfig) StunConfig() StunConfig {
 }
 
 // pj_dns_resolver * resolver
+func (tc *IceTransportConfig) DnsResolver() *DnsResolver {
+    return &DnsResolver{tc.t.resolver}
+}
+
+func (tc *IceTransportConfig) SetDnsResolver(d *DnsResolver) {
+    tc.t.resolver = d.d
+}
 
 // pj_ice_sess_options opt
 func (tc *IceTransportConfig) IceSessOptions() IceSessOptions {

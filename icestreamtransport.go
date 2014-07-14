@@ -158,7 +158,7 @@ func (i *IceStreamTransport) CandsCount(compId uint) uint {
 
 // helper function to turn pj_ice_sess_cand[] -> []IceSessCand
 func cArrayToCandSlice(c unsafe.Pointer, length uint) []IceSessCand {
-    cands := make([]IceSessCand,length)
+    cands := make([]IceSessCand,0)
     var arrayptr = uintptr(c)
     for i:=0; i < int(length); i++ {
         cands = append(cands,IceSessCand{(*C.pj_ice_sess_cand) (unsafe.Pointer(arrayptr))})
@@ -168,10 +168,12 @@ func cArrayToCandSlice(c unsafe.Pointer, length uint) []IceSessCand {
 }
 
 // pj_status_t pj_ice_strans_enum_cands (pj_ice_strans *ice_st, unsigned comp_id, unsigned *count, pj_ice_sess_cand cand[])
-func (i *IceStreamTransport) GetCands(compId uint) ([]IceSessCand, error) {
-    var c *C.pj_ice_sess_cand
+func (i *IceStreamTransport) Cands(compId uint) ([]IceSessCand, error) {
+	c := C.calloc(C.size_t(100),12)
+    // C.sizeof(C.pj_ice_sess_cand)
+    //var c *C.pj_ice_sess_cand
     max := C.uint(100)
-    status := C.pj_ice_strans_enum_cands(i.i,C.uint(compId),&max,c)
+    status := C.pj_ice_strans_enum_cands(i.i,C.uint(compId),&max,(*C.pj_ice_sess_cand) (c))
     if status != C.PJ_SUCCESS {
         return cArrayToCandSlice(unsafe.Pointer(c),uint(max)), casterr(status)
     }
@@ -181,12 +183,12 @@ func (i *IceStreamTransport) GetCands(compId uint) ([]IceSessCand, error) {
 // pj_status_t pj_ice_strans_get_def_cand (pj_ice_strans *ice_st, unsigned comp_id, pj_ice_sess_cand *cand)
 func (i *IceStreamTransport) Cand(compId uint) (IceSessCand, error) {
     id := C.uint(compId)
-    cand := IceSessCand{}
+    cand := &IceSessCand{}
     status := C.pj_ice_strans_get_def_cand(i.i,id,cand.c)
     if status != C.PJ_SUCCESS {
-        return cand, casterr(status)
+        return *cand, casterr(status)
     }
-    return cand, nil
+    return *cand, nil
 }
 
 // pj_ice_sess_role pj_ice_strans_get_role (pj_ice_strans *ice_st)

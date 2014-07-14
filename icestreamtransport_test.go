@@ -30,7 +30,6 @@ func TestIceTransport(t *testing.T) {
     if stt != 1 {
         t.Fatalf("State should return 1, returned: %d",stt)
     }
-    t.Logf("State: %d",stt)
     t.Logf("State Name: %s",TransportStateName(stt))
     //time.Sleep(10*time.Second)
     hassess := trans.HasSess()
@@ -61,5 +60,17 @@ func TestIceTransport(t *testing.T) {
     }
     t.Logf("UfragPwd: %s %s %s %s",lu,lp,ru,rp)
     numCands := trans.CandsCount(1)
-    t.Fatalf("CandCount: %d",numCands)
+    t.Logf("CandCount: %d",numCands)
+    cands,err := trans.Cands(1)
+    if err != nil {
+        t.Fatalf("Cands error: %s",err)
+    }
+    adr := cands[0].Addr()
+    t.Logf("cand[0] IP: %d",(&adr).IP())
+    t.Logf("cand[0] Port: %d",(&adr).Port())
+    t.Logf("cand[0] LocalPref: %d",cands[0].LocalPref())
+    t.Logf("cand[0] TransportId: %d",cands[0].TransportId())
+    t.Logf("cand[0] ComponentId: %d",cands[0].ComponentId())
+    t.Logf("cand[0] Priority: %d",cands[0].Priority())
+    
 }

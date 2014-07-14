@@ -52,11 +52,11 @@ func (c *StunSockConfig) SetAsyncCount(u uint) {
 // pj_stun_sock_info structure. If the port is set to zero, the socket
 // will bind at any port (chosen by the OS).
 func (c *StunSockConfig) BoundAddr() *SockAddr {
-    return &SockAddr{c.c.bound_addr}
+    return &SockAddr{&c.c.bound_addr}
 }
 
 func (c *StunSockConfig) SetBoundAddr(s SockAddr) {
-    c.c.bound_addr = s.s
+    c.c.bound_addr = *s.s
 }
 
 // Specify the port range for STUN socket binding, relative to the start

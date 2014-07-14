@@ -107,11 +107,11 @@ func (c *IceSessCand) SeetPriority(i uint32) {
 // will be the address allocated in the TURN server by STUN Allocate
 // request. 
 func (c *IceSessCand) Addr() SockAddr {
-    return SockAddr{c.c.addr}
+    return SockAddr{&c.c.addr}
 }
 
 func (c *IceSessCand) SetAddr(s SockAddr) {
-    c.c.addr = s.s
+    c.c.addr = *s.s
 }
 
 // Base address of this candidate. "Base" refers to the address an agent
@@ -121,19 +121,19 @@ func (c *IceSessCand) SetAddr(s SockAddr) {
 // candidates, the base address is the transport address allocated in
 // the TURN server for this candidate. 
 func (c *IceSessCand) BaseAddr() SockAddr {
-    return SockAddr{c.c.base_addr}
+    return SockAddr{&c.c.base_addr}
 }
 
 func (c *IceSessCand) SetBaseAddr(s SockAddr) {
-    c.c.base_addr = s.s
+    c.c.base_addr = *s.s
 }
 
 // Related address, which is used for informational only and is not used
 // in any way by the ICE session.
 func (c *IceSessCand) RelAddr() SockAddr {
-    return SockAddr{c.c.rel_addr}
+    return SockAddr{&c.c.rel_addr}
 }
 
 func (c *IceSessCand) SetRelAddr(s SockAddr) {
-    c.c.rel_addr = s.s
+    c.c.rel_addr = *s.s
 }

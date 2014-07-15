@@ -97,9 +97,11 @@ func (i *IceStreamTransport) InitIce(r IceSessRole, locUfrag, locPwd string) err
     uf := C.CString(locUfrag)
     defer C.free(unsafe.Pointer(uf))
     ufrag := C.pj_str(uf)
+    //defer destroyString(ufrag)
     p := C.CString(locPwd)
     defer C.free(unsafe.Pointer(p))
     pwd := C.pj_str(p)
+    //defer destroyString(pwd)
     status := C.pj_ice_strans_init_ice(i.i, C.pj_ice_sess_role(r), &ufrag, &pwd)
     if status != C.PJ_SUCCESS {
         return casterr(status)
@@ -129,21 +131,14 @@ func (i *IceStreamTransport) RunningCompCount() uint {
 
 // pj_status_t pj_ice_strans_get_ufrag_pwd (pj_ice_strans *ice_st, pj_str_t *loc_ufrag, pj_str_t *loc_pwd, pj_str_t *rem_ufrag, pj_str_t *rem_pwd)
 func (i *IceStreamTransport) UfragPwd() (string, string, string, string, error) {
-    var locUfrag, locPwd, remUfrag, remPwd *C.pj_str_t
-    status := C.pj_ice_strans_get_ufrag_pwd(i.i,locUfrag, locPwd, remUfrag, remPwd)
+    var locUfrag, locPwd, remUfrag, remPwd C.pj_str_t
+    status := C.pj_ice_strans_get_ufrag_pwd(i.i,&locUfrag, &locPwd, &remUfrag, &remPwd)
     var lu, lp, ru, rp string
-    if locUfrag != nil {
-		lu = toString(*locUfrag)
-	}
-	if locPwd != nil {
-		lp = toString(*locPwd)
-	}
-	if remUfrag != nil {
-		ru = toString(*remUfrag)
-	}
-	if remPwd != nil {
-		rp = toString(*remPwd)
-	}
+    
+	lu = toString(locUfrag)
+	lp = toString(locPwd)
+	ru = toString(remUfrag)
+	rp = toString(remPwd)
 	
     if status != C.PJ_SUCCESS {
         return lu,lp,ru,rp, casterr(status)

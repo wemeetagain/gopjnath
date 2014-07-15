@@ -7,7 +7,7 @@ import (
   
 func TestIceTransportConfig(t *testing.T) {
 	context := NewContext("test_IceTransportConfig")
-    c := NewIceTransportConfig(context)
+    c := context.NewIceTransportConfig()
         dns,err := context.NewDnsResolver()
     if err != nil {
         t.Fatalf("NewDnsResolver error: %s",err)

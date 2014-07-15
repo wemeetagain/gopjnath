@@ -55,7 +55,7 @@ func (c *StunSockConfig) BoundAddr() *SockAddr {
     return &SockAddr{&c.c.bound_addr}
 }
 
-func (c *StunSockConfig) SetBoundAddr(s SockAddr) {
+func (c *StunSockConfig) SetBoundAddr(s *SockAddr) {
     c.c.bound_addr = *s.s
 }
 

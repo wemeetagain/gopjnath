@@ -23,10 +23,10 @@ type IceTransportConfig struct {
 }
 
 // void pj_ice_strans_cfg_default (pj_ice_strans_cfg *cfg)
-func NewIceTransportConfig(c *Context) *IceTransportConfig {
+func (c *Context) NewIceTransportConfig() *IceTransportConfig {
     var cfg C.pj_ice_strans_cfg
     C.pj_ice_strans_cfg_default(&cfg)
-    C.pj_stun_config_init(&cfg.stun_cfg,&c.cp.factory,0,c.io,c.tHeap)
+    C.pj_stun_config_init(&cfg.stun_cfg, &c.cp.factory, 0, c.io, c.tHeap)
     tc := IceTransportConfig{&cfg}
     return &tc
 }
@@ -75,6 +75,10 @@ func (tc *IceTransportConfig) IceSessOptions() IceSessOptions {
 // pj_stun_sock_cfg cfg
 func (tc *IceTransportConfig) StunSockConfig() StunSockConfig {
     return StunSockConfig{tc.t.stun.cfg}
+}
+
+func (tc *IceTransportConfig) SetStunSockConfig(c StunSockConfig) {
+    tc.t.stun.cfg = c.c
 }
 
 // unsigned max_host_cands

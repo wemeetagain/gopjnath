@@ -2,8 +2,9 @@ package gopjnath
 
 import (
     //"fmt"
+    //"net"
     "testing"
-    //"time"
+    "time"
     )
 
 var tester *testing.T
@@ -18,7 +19,7 @@ func testIceCallback(op IceTransportOp,err error) {
 func TestIceTransport(t *testing.T) {
     tester = t
     context := NewContext("test")
-    c := NewIceTransportConfig(context)
+    c := context.NewIceTransportConfig()
     dns,err := context.NewDnsResolver()
     if err != nil {
         t.Fatalf("NewDnsResolver error: %s",err)
@@ -28,6 +29,10 @@ func TestIceTransport(t *testing.T) {
         t.Fatalf("SetNs error: %s",err)
     }
     c.SetDnsResolver(dns)
+    ssc := NewStunSockConfig()
+    sa, _ := NewSockAddr(AfIP,"0.0.0.0",0)
+    ssc.SetBoundAddr(sa)
+    c.SetStunSockConfig(ssc)
     c.SetStunServer("203.183.172.196")
     c.SetStunPort(3478)
     trans,err := NewIceStreamTransport("test",*c,1,nil,testIceCallback)
@@ -40,7 +45,11 @@ func TestIceTransport(t *testing.T) {
         t.Fatalf("State should return 1, returned: %d",stt)
     }
     t.Logf("State Name: %s",TransportStateName(stt))
-    //time.Sleep(10*time.Second)
+    
+    for i:=0;i<1;i++ {
+        time.Sleep(time.Second)
+    }
+    
     hassess := trans.HasSess()
     if hassess != false {
         t.Fatalf("HassSess should return false, returned: %t",hassess)
@@ -63,11 +72,11 @@ func TestIceTransport(t *testing.T) {
         t.Fatalf("StartIce error: %s",err)
     }
     // run after ice starts otherwise, boom
-    lu,lp, ru, rp, err := trans.UfragPwd()
-    if err != nil {
-        t.Fatalf("UfragPwd error: %s",err)
-    }
-    t.Logf("UfragPwd: %s %s %s %s",lu,lp,ru,rp)
+    //lu,lp, ru, rp, err := trans.UfragPwd()
+    //if err != nil {
+    //    t.Fatalf("UfragPwd error: %s",err)
+    //}
+    //t.Logf("UfragPwd: %s %s %s %s",lu,lp,ru,rp)
     numCands := trans.CandsCount(1)
     t.Logf("CandCount: %d",numCands)
     cands,err := trans.Cands(1)

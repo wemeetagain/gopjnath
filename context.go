@@ -18,10 +18,10 @@ func NewContext(name string) *Context {
 	c := Context{}
 	c.name = C.CString(name)
 	
-	C.pj_caching_pool_init(&c.cp, &C.pj_pool_factory_default_policy, C.pj_size_t(10))
-    c.pool = C.pj_pool_create(&c.cp.factory,c.name,C.pj_size_t(1000),C.pj_size_t(1000),nil)
-    C.pj_timer_heap_create(c.pool,C.pj_size_t(1000),&c.tHeap)
-    C.pj_ioqueue_create(c.pool,C.pj_size_t(16),&c.io)
+	C.pj_caching_pool_init(&c.cp, &C.pj_pool_factory_default_policy, C.pj_size_t(100))
+    c.pool = C.pj_pool_create(&c.cp.factory,c.name,C.pj_size_t(2000),C.pj_size_t(2000),nil)
+    C.pj_timer_heap_create(c.pool,C.pj_size_t(2000),&c.tHeap)
+    C.pj_ioqueue_create(c.pool,C.pj_size_t(32),&c.io)
     
     // set up polling
     pollArgs := C.malloc(C.size_t(4))

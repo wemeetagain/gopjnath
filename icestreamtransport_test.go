@@ -46,7 +46,7 @@ func TestIceTransport(t *testing.T) {
     }
     t.Logf("State Name: %s",TransportStateName(stt))
     
-    for i:=0;i<1;i++ {
+    for i:=0;i<5;i++ {
         time.Sleep(time.Second)
     }
     
@@ -67,10 +67,14 @@ func TestIceTransport(t *testing.T) {
     t.Logf("SessIsComplete: %t",siscom)
     testufrag := "testufrag"
     testpwd := "testpwd"
-    err = trans.InitIce(IceSessRoleControlling,testufrag,testpwd)
+    err = trans.InitIce(IceSessRoleControlled,testufrag,testpwd)
     if err != nil {
         t.Fatalf("StartIce error: %s",err)
     }
+    for i:=0;i<5;i++ {
+        time.Sleep(time.Second)
+    }
+    
     // run after ice starts otherwise, boom
     //lu,lp, ru, rp, err := trans.UfragPwd()
     //if err != nil {

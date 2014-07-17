@@ -6,7 +6,14 @@ package gopjnath
 #include <pjlib-util.h>
 #include <pjnath.h>
 
-void poll(int *quit,long *delay,pj_ioqueue_t *io, pj_timer_heap_t *theap);
+typedef struct poll_struct {
+  int *quit;
+  int *delay;
+  pj_ioqueue_t *io;
+  pj_timer_heap_t *tHeap;
+} poll_struct;
+
+void poll(poll_struct *args);
 */
 import "C"
 
@@ -14,33 +21,42 @@ import (
     "unsafe"
     )
 
+type Context struct {
+	name *C.char
+	cp C.pj_caching_pool
+    pool *C.pj_pool_t
+    tHeap *C.pj_timer_heap_t
+    io *C.pj_ioqueue_t
+    poll *C.pj_thread_t
+    quit *C.int
+}
+
 func NewContext(name string) *Context {
 	c := Context{}
 	c.name = C.CString(name)
-	
-	C.pj_caching_pool_init(&c.cp, &C.pj_pool_factory_default_policy, C.pj_size_t(100))
-    c.pool = C.pj_pool_create(&c.cp.factory,c.name,C.pj_size_t(2000),C.pj_size_t(2000),nil)
-    C.pj_timer_heap_create(c.pool,C.pj_size_t(2000),&c.tHeap)
-    C.pj_ioqueue_create(c.pool,C.pj_size_t(32),&c.io)
+    q := C.int(0)
+    c.quit = (*C.int) (C.malloc(C.size_t(unsafe.Sizeof(q))))
+    *c.quit = q
+    
+	_ = C.pj_caching_pool_init(&c.cp, &C.pj_pool_factory_default_policy, C.pj_size_t(100))
+    c.pool = C.pj_pool_create(&c.cp.factory,c.name,C.pj_size_t(1000),C.pj_size_t(1000),nil)
+    C.pj_timer_heap_create(c.pool,C.pj_size_t(100),&c.tHeap)
+    C.pj_ioqueue_create(c.pool,C.pj_size_t(16),&c.io)
     
     // set up polling
-    pollArgs := C.malloc(C.size_t(4))
-    pollPtr := uintptr(unsafe.Pointer(pollArgs))
-    *(**C.int) (unsafe.Pointer(pollPtr)) = c.quit
-    pollPtr++
-    //delay := C.malloc(C.sizeof(C.long))
-    //(C.long) (unsafe.Pointer(delay)) = C.long(10)
-    //*(**C.long) (unsafe.Pointer(pollPtr)) = delay
-    pollPtr++
-    *(**C.pj_ioqueue_t) (unsafe.Pointer(pollPtr)) = c.io
-    pollPtr++
-    *(**C.pj_timer_heap_t) (unsafe.Pointer(pollPtr)) = c.tHeap
+    var pollArgs C.poll_struct
+    pollArgs.quit = c.quit
+    delay := C.int(50)
+    pollArgs.delay = &delay
+    pollArgs.io = c.io
+    pollArgs.tHeap = c.tHeap
+
+    C.pj_thread_create(c.pool,c.name,(*C.pj_thread_proc) (C.poll),unsafe.Pointer(&pollArgs),0,0,&c.poll)
     
-    C.pj_thread_create(c.pool,c.name,(*C.pj_thread_proc) (C.poll),pollArgs,0,0,&c.poll)
     return &c
 }
 
 func (c *Context) Destroy() {
 	C.free(unsafe.Pointer(c.name))
-	//c.quit = &C.int(1)
+	*c.quit = C.int(1)
 }

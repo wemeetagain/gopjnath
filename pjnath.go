@@ -19,16 +19,6 @@ func init() {
     C.pjnath_init()
 }
 
-type Context struct {
-	name *C.char
-	cp C.pj_caching_pool
-    pool *C.pj_pool_t
-    tHeap *C.pj_timer_heap_t
-    io *C.pj_ioqueue_t
-    poll *C.pj_thread_t
-    quit *C.int
-}
-
 /*
 func (c *Context) poll() {
     var delay C.pj_time_val
